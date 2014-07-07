@@ -1,0 +1,50 @@
+parsed:
+#toplevel {            ## by peg : ( Spacing (ExternalDeclaration^)+ EOT  ) defined in TranslationUnit
+   #function {            ## by peg : ( DeclarationSpecifiers^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
+      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
+         #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+            #c.struct: struct    ## by peg : ( STRUCT  ) defined in StructOrUnion
+            #name: student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+         }
+      }
+      #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+         #name: new_Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+      }
+      #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
+         #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
+            #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
+               #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+                  #c.struct: struct    ## by peg : ( STRUCT  ) defined in StructOrUnion
+                  #name: student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+               }
+            }
+            #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+               #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+            }
+         }
+         #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
+            #assign {            ## by peg : ( UnaryExpression^ AssignmentOperator^ AssignmentExpression^  ) defined in AssignmentExpression
+               #field {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
+                  #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+                  #name: number    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+               }
+               #c.assignmentoperator: =    ## by peg : ( (EQU / STAREQU / DIVEQU / MODEQU / PLUSEQU / MINUSEQU / LEFTEQU / RIGHTEQU / ANDEQU / HATEQU / OREQU)^  ) defined in AssignmentOperator
+               #integer: 10   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
+            }
+         }
+         #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
+            #assign {            ## by peg : ( UnaryExpression^ AssignmentOperator^ AssignmentExpression^  ) defined in AssignmentExpression
+               #field {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
+                  #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+                  #name: name    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+               }
+               #c.assignmentoperator: =    ## by peg : ( (EQU / STAREQU / DIVEQU / MODEQU / PLUSEQU / MINUSEQU / LEFTEQU / RIGHTEQU / ANDEQU / HATEQU / OREQU)^  ) defined in AssignmentOperator
+               #string: "naruto"   ## by peg : ( 'L'? (["] (StringChar^)* ["] Spacing)+  ) defined in StringLiteral
+            }
+         }
+         #return {            ## by peg : ( RETURN^ (Expression^)? SEMI  ) defined in JumpStatement
+            #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+         }
+      }
+   }
+}

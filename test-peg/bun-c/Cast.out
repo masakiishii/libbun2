@@ -1,0 +1,4 @@
+parsed:
+#error:    :syntax error by #error*
+** uncosumed: 'char n = (char)(p);
+' **

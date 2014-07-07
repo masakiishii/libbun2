@@ -1,0 +1,18 @@
+parsed:
+#toplevel {            ## by peg : ( Spacing (ExternalDeclaration^)+ EOT  ) defined in TranslationUnit
+   #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
+      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
+         #c.storageclassspecifier: typedef    ## by peg : ( (TYPEDEF / EXTERN / STATIC / AUTO / REGISTER)^  ) defined in StorageClassSpecifier
+         #c.typespecifier: void    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+      }
+      #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+         #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+            #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
+            #name: Func   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+         }
+         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
+            #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+         }
+      }
+   }
+}
