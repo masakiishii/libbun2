@@ -1,17 +1,8 @@
 parsed:
-#toplevel {            ## by peg : ( Spacing (ExternalDeclaration^)+ EOT  ) defined in TranslationUnit
-   #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-      #c.storageclassspecifier: typedef    ## by peg : ( (TYPEDEF / EXTERN / STATIC / AUTO / REGISTER)^  ) defined in StorageClassSpecifier
-      #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-         #c.enumeratorlist {            ## by peg : ( (COMMA Enumerator^)*  ) defined in EnumeratorList
-            #name: VOID   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            #name: INT   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            #name: CHAR
-   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         }
-      }
-   }
-   #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
-      #name: Type   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-   }
-}
+#error:    :syntax error by #error*
+** uncosumed: 'typedef enum {
+	VOID,
+	INT,
+	CHAR
+} Type;
+' **

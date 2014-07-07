@@ -125,7 +125,7 @@ Declaration
     ;
 
 DeclarationNoAttribute
-    = DeclarationSpecifiers@ InitDeclaratorList@?
+    = TypeSpecifier@ InitDeclaratorList@?
     ;
 
 DeclarationSpecifiers
