@@ -9,15 +9,13 @@ parsed:
          #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
       }
       #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
-         #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
-            #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-               #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-            }
-            #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
-               #name: a   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               #arraysize {            ## by peg : ( LBRK (TypeQualifier^)* (AssignmentExpression^)? RBRK  ) defined in DirectDeclarator
-                  #integer: 10   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
-               }
+         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
+            #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+         }
+         #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
+            #name: a   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+            #arraysize {            ## by peg : ( LBRK (TypeQualifier^)* (AssignmentExpression^)? RBRK  ) defined in DirectDeclarator
+               #integer: 10   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
             }
          }
          #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement

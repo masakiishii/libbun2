@@ -9,16 +9,14 @@ parsed:
       }
       #name: new_Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
       #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
-         #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
-            #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-               #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-                  #c.struct: struct    ## by peg : ( STRUCT  ) defined in StructOrUnion
-                  #name: student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               }
+         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
+            #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+               #c.struct: struct    ## by peg : ( STRUCT  ) defined in StructOrUnion
+               #name: student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
             }
-            #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
-               #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            }
+         }
+         #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
+            #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
          #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
             #assign {            ## by peg : ( UnaryExpression^ AssignmentOperator^ AssignmentExpression^  ) defined in AssignmentExpression

@@ -121,7 +121,7 @@ DeclarationList
 //-------------------------------------------------------------------------
 
 Declaration
-    = << DeclarationNoAttribute@ (Attribute / Assembler)@? SEMI #c.declaration >>
+    = DeclarationNoAttribute@ (Attribute / Assembler)@? SEMI
     ;
 
 DeclarationNoAttribute
