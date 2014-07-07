@@ -153,7 +153,7 @@ InitDeclaratorList
     ;
 
 InitDeclarator
-    = Declarator@ (EQU Initializer@)?
+    = << Pointer@? DirectDeclarator@ (EQU Initializer@)? #assign >>
     ;
 
 StorageClassSpecifier
@@ -253,14 +253,14 @@ AttributeParamList = LPAR (AttributeParam@ (COMMA AttributeParam@)*)? RPAR;
 Assembler = ASM LPAR (StringLiteral (COMMA StringLiteral)*)? RPAR;
 
 Declarator
-    = << Pointer@? DirectDeclarator@ #c.declarator >>
+    = Pointer@? DirectDeclarator@
     ;
 
 DirectDeclarator
     = ( Identifier@
       / LPAR Declarator@ RPAR
       )
-      ( LBRK TypeQualifier@* AssignmentExpression@? RBRK
+      ( << LBRK TypeQualifier@* AssignmentExpression@? RBRK #arraysize >>
       / LBRK STATIC@ TypeQualifier@* AssignmentExpression@ RBRK
       / LBRK TypeQualifier@+ STATIC@ AssignmentExpression@ RBRK
       / LBRK TypeQualifier@* STAR@ RBRK
