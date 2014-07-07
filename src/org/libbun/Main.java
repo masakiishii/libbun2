@@ -47,6 +47,9 @@ public class Main {
 	// --verbose:peg
 	public static boolean VerbosePegMode = false;
 
+	// --verbose:ast
+	public static boolean EnableVerboseAst = false;
+
 	// --verbose:bun
 	public static boolean VerboseBunMode = false;
 
@@ -97,6 +100,9 @@ public class Main {
 			else if(argument.startsWith("--verbose")) {
 				if(argument.equals("--verbose:bun")) {
 					VerboseBunMode = true;
+				}
+				else if(argument.equals("--verbose:ast")) {
+				    EnableVerboseAst = true;
 				}
 				else {
 					VerboseMode = true;
@@ -205,7 +211,7 @@ public class Main {
 					node = context.newErrorObject();
 				}
 				gamma.setNode(node);
-				if(VerbosePegMode) {
+				if(VerbosePegMode || EnableVerboseAst) {
 					System.out.println("parsed:\n" + node.toString());
 					if(context.hasChar()) {
 						System.out.println("** uncosumed: '" + context + "' **");
