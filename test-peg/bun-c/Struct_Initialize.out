@@ -11,7 +11,6 @@ parsed:
          #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
             #name: factory    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
-         #c.initializer: {}   ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
       }
    }
 }

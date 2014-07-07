@@ -8,9 +8,7 @@ parsed:
          #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
             #name: c0    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
-         #c.initializer {            ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
-            #float: 1.   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
-         }
+         #float: 1.   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
       }
    }
    #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
@@ -21,9 +19,7 @@ parsed:
          #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
             #name: c1    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
-         #c.initializer {            ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
-            #float: 2.0   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
-         }
+         #float: 2.0   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
       }
    }
    #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
@@ -34,9 +30,7 @@ parsed:
          #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
             #name: c2    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
-         #c.initializer {            ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
-            #float: .3   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
-         }
+         #float: .3   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
       }
    }
    #c.declaration {            ## by peg : ( DeclarationNoAttribute^ ((Attribute / Assembler)^)? SEMI  ) defined in Declaration
@@ -47,9 +41,7 @@ parsed:
          #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
             #name: c2    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
-         #c.initializer {            ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
-            #float: 4.f   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
-         }
+         #float: 4.f   ## by peg : ( (DecimalFloatConstant / HexFloatConstant) FloatSuffix?  ) defined in FloatConstant
       }
    }
 }

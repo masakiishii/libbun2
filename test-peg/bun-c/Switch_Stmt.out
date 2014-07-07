@@ -19,9 +19,7 @@ parsed:
                #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
                   #name: n    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
                }
-               #c.initializer {            ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
-                  #integer: 1   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
-               }
+               #integer: 1   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
             }
          }
          #switch {            ## by peg : ( SWITCH LPAR Expression^ RPAR Statement^  ) defined in SelectionStatement

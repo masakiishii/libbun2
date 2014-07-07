@@ -19,9 +19,7 @@ parsed:
                #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
                   #name: a    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
                }
-               #c.initializer {            ## by peg : ( (AssignmentExpression^ / LWING (InitializerList^)* COMMA? RWING)  ) defined in Initializer
-                  #integer: 1   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
-               }
+               #integer: 1   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
             }
          }
          #return {            ## by peg : ( RETURN^ (Expression^)? SEMI  ) defined in JumpStatement

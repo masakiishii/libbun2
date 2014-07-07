@@ -149,7 +149,7 @@ DeclarationSpecifiers
     ;
 
 InitDeclaratorList
-    = InitDeclarator <<@ (COMMA InitDeclarator@) #c.initdeclaratorlist >>*
+    = InitDeclarator@ (COMMA InitDeclarator@)*
     ;
 
 InitDeclarator
@@ -313,8 +313,8 @@ TypedefName
     ;
 
 Initializer
-    = << (AssignmentExpression@
-    / LWING InitializerList@* COMMA? RWING) #c.initializer>>
+    = (AssignmentExpression@
+    / LWING InitializerList@* COMMA? RWING)
     ;
 
 InitializerList
