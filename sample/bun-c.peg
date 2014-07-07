@@ -108,7 +108,7 @@ ExternalDeclaration
     ;
 
 FunctionDefinition
-    = << DeclarationSpecifiers@ Declarator@ DeclarationList@? CompoundStatement@ #function >>
+    = << TypeSpecifier@ Declarator@ DeclarationList@? CompoundStatement@ #function >>
     ;
 
 DeclarationList

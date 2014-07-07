@@ -1,142 +1,27 @@
 parsed:
-#toplevel {            ## by peg : ( Spacing (ExternalDeclaration^)+ EOT  ) defined in TranslationUnit
-   #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-      #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-         #c.struct: struct    ## by peg : ( STRUCT  ) defined in StructOrUnion
-         #name: student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         #c.structdeclaration {            ## by peg : ( SpecifierQualifierList StructDeclaratorList^ SEMI  ) defined in StructDeclaration
-            #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-            #c.structdeclaratorlist {            ## by peg : ( StructDeclarator^ (COMMA StructDeclarator^)*  ) defined in StructDeclaratorList
-               #name: number   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            }
-         }
-         #c.structdeclaration {            ## by peg : ( SpecifierQualifierList StructDeclaratorList^ SEMI  ) defined in StructDeclaration
-            #c.typespecifier: char    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-            #c.structdeclaratorlist {            ## by peg : ( StructDeclarator^ (COMMA StructDeclarator^)*  ) defined in StructDeclaratorList
-               #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-               #name: name   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            }
-         }
-      }
-   }
-   #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-      #c.storageclassspecifier: typedef    ## by peg : ( (TYPEDEF / EXTERN / STATIC / AUTO / REGISTER)^  ) defined in StorageClassSpecifier
-      #c.typespecifier {            ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-         #c.struct: struct    ## by peg : ( STRUCT  ) defined in StructOrUnion
-         #name: student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-      }
-   }
-   #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
-      #name: Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-   }
-   #function {            ## by peg : ( DeclarationSpecifiers^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)* TypedefName^ (StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)*  ) defined in DeclarationSpecifiers
-         #c.typedefname {            ## by peg : ( Identifier^  ) defined in TypedefName
-            #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         }
-      }
-      #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-      #name: new_Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-         #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-      }
-      #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
-         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)* TypedefName^ (StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)*  ) defined in DeclarationSpecifiers
-            #c.typedefname {            ## by peg : ( Identifier^  ) defined in TypedefName
-               #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            }
-         }
-         #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
-            #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-            #name: s    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            #c.castexpression {            ## by peg : ( ((LPAR TypeName RPAR)^)+ UnaryExpression^  ) defined in CastExpression
-               #c.typename {            ## by peg : ( SpecifierQualifierList^ (AbstractDeclarator^)?  ) defined in TypeName
-                  #c.typedefname {            ## by peg : ( Identifier^  ) defined in TypedefName
-                     #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  }
-                  #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-               }
-               #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                  #name: malloc   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  #c.sizeof {            ## by peg : ( SIZEOF  (UnaryExpression^ / LPAR^ TypeName^ RPAR^) ) defined in UnaryExpression
-                     #name: Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  }
-               }
-            }
-         }
-         #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
-            #assign {            ## by peg : ( UnaryExpression^ AssignmentOperator^ AssignmentExpression^  ) defined in AssignmentExpression
-               #ptr {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                  #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  #name: number    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               }
-               #c.assignmentoperator: =    ## by peg : ( (EQU / STAREQU / DIVEQU / MODEQU / PLUSEQU / MINUSEQU / LEFTEQU / RIGHTEQU / ANDEQU / HATEQU / OREQU)^  ) defined in AssignmentOperator
-               #integer: 10   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
-            }
-         }
-         #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
-            #assign {            ## by peg : ( UnaryExpression^ AssignmentOperator^ AssignmentExpression^  ) defined in AssignmentExpression
-               #ptr {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                  #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  #name: name    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               }
-               #c.assignmentoperator: =    ## by peg : ( (EQU / STAREQU / DIVEQU / MODEQU / PLUSEQU / MINUSEQU / LEFTEQU / RIGHTEQU / ANDEQU / HATEQU / OREQU)^  ) defined in AssignmentOperator
-               #string: "naruto"   ## by peg : ( 'L'? (["] (StringChar^)* ["] Spacing)+  ) defined in StringLiteral
-            }
-         }
-         #return {            ## by peg : ( RETURN^ (Expression^)? SEMI  ) defined in JumpStatement
-            #name: s   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         }
-      }
-   }
-   #function {            ## by peg : ( DeclarationSpecifiers^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-         #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-      }
-      #name: main   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-         #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-      }
-      #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
-         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)* TypedefName^ (StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)*  ) defined in DeclarationSpecifiers
-            #c.typedefname {            ## by peg : ( Identifier^  ) defined in TypedefName
-               #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            }
-         }
-         #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
-            #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-            #name: a    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-               #name: new_Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-            }
-         }
-         #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
-            #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-               #name: printf   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               #c.argumentexpressionlist {            ## by peg : ( (COMMA AssignmentExpression^)  ) defined in ArgumentExpressionList
-                  #string: "%d\n"   ## by peg : ( 'L'? (["] (StringChar^)* ["] Spacing)+  ) defined in StringLiteral
-                  #ptr {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                     #name: a   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                     #name: number   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  }
-               }
-            }
-         }
-         #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement
-            #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-               #name: printf   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               #c.argumentexpressionlist {            ## by peg : ( (COMMA AssignmentExpression^)  ) defined in ArgumentExpressionList
-                  #string: "%s\n"   ## by peg : ( 'L'? (["] (StringChar^)* ["] Spacing)+  ) defined in StringLiteral
-                  #ptr {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                     #name: a   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                     #name: name   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                  }
-               }
-            }
-         }
-         #return {            ## by peg : ( RETURN^ (Expression^)? SEMI  ) defined in JumpStatement
-            #integer: 0   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant
-         }
-      }
-   }
+#error:    :syntax error by #error*
+** uncosumed: '#include <stdio.h>
+#include <stdlib.h>
+
+struct student {
+	int number;
+	char *name;
+};
+
+typedef struct student Student;
+
+Student *new_Student(void) {
+	Student *s = (Student *)malloc(sizeof(Student));
+	s->number = 10;
+	s->name = "naruto";
+	return s;
 }
+
+
+int main(void) {
+	Student *a = new_Student();
+	printf("%d\n", a->number);
+	printf("%s\n", a->name);
+	return 0;
+}
+' **

@@ -1,9 +1,7 @@
 parsed:
 #toplevel {            ## by peg : ( Spacing (ExternalDeclaration^)+ EOT  ) defined in TranslationUnit
-   #function {            ## by peg : ( DeclarationSpecifiers^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-         #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-      }
+   #function {            ## by peg : ( TypeSpecifier^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
+      #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
       #name: main   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
       #param {            ## by peg : ( (COMMA ParameterDeclaration^)  ) defined in ParameterList
          #c.parameterdeclaration {            ## by peg : ( (Declarator / AbstractDeclarator)^  ) defined in ParameterDeclaration
