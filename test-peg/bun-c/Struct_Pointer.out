@@ -57,23 +57,21 @@ parsed:
                   #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
                }
             }
-            #c.initdeclarator {            ## by peg : ( (EQU Initializer^)  ) defined in InitDeclarator
-               #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
-                  #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-                  #name: s    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               }
-               #c.castexpression {            ## by peg : ( ((LPAR TypeName RPAR)^)+ UnaryExpression^  ) defined in CastExpression
-                  #c.typename {            ## by peg : ( SpecifierQualifierList^ (AbstractDeclarator^)?  ) defined in TypeName
-                     #c.typedefname {            ## by peg : ( Identifier^  ) defined in TypedefName
-                        #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                     }
-                     #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
+            #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+               #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
+               #name: s    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+            }
+            #c.castexpression {            ## by peg : ( ((LPAR TypeName RPAR)^)+ UnaryExpression^  ) defined in CastExpression
+               #c.typename {            ## by peg : ( SpecifierQualifierList^ (AbstractDeclarator^)?  ) defined in TypeName
+                  #c.typedefname {            ## by peg : ( Identifier^  ) defined in TypedefName
+                     #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
                   }
-                  #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                     #name: malloc   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                     #c.sizeof {            ## by peg : ( SIZEOF  (UnaryExpression^ / LPAR^ TypeName^ RPAR^) ) defined in UnaryExpression
-                        #name: Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-                     }
+                  #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
+               }
+               #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
+                  #name: malloc   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+                  #c.sizeof {            ## by peg : ( SIZEOF  (UnaryExpression^ / LPAR^ TypeName^ RPAR^) ) defined in UnaryExpression
+                     #name: Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
                   }
                }
             }
@@ -120,14 +118,12 @@ parsed:
                   #name: Student    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
                }
             }
-            #c.initdeclarator {            ## by peg : ( (EQU Initializer^)  ) defined in InitDeclarator
-               #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
-                  #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-                  #name: a    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               }
-               #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
-                  #name: new_Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-               }
+            #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+               #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
+               #name: a    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+            }
+            #apply {            ## by peg : ( (FunctionCall  / Index  / DOT  Identifier^ / PTR  Identifier^ / INC  / DEC ) ) defined in PostfixExpression
+               #name: new_Student   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
             }
          }
          #c.expressionstatement {            ## by peg : ( (Expression^)? SEMI  ) defined in ExpressionStatement

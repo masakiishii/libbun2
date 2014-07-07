@@ -7,10 +7,8 @@ parsed:
             #name: KonohaFactory    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
          }
       }
-      #c.initdeclarator {            ## by peg : ( (EQU Initializer^)  ) defined in InitDeclarator
-         #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
-            #name: factory    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         }
+      #c.declarator {            ## by peg : ( (Pointer^)? DirectDeclarator^  ) defined in Declarator
+         #name: factory    ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
       }
    }
 }
