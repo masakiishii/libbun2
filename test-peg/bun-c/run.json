@@ -1,0 +1,5 @@
+{
+    "peg" : "#{SOURCE_ROOT}/sample/bun-c.peg",
+    "input.ext" : "c",
+    "output.ext" : "out"
+}
