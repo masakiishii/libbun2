@@ -36,12 +36,8 @@ parsed:
    #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
       #name: fptr_t   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
       #param {            ## by peg : ( (COMMA ParameterDeclaration^)  ) defined in ParameterList
-         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-            #c.typespecifier: float   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-         }
-         #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-            #c.typespecifier: char   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-         }
+         #c.typespecifier: float   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+         #c.typespecifier: char   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
       }
    }
    #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)* TypedefName^ (StorageClassSpecifier / TypeQualifier / FunctionSpecifier / Attribute)*  ) defined in DeclarationSpecifiers

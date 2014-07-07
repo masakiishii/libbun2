@@ -3,9 +3,7 @@ parsed:
    #function {            ## by peg : ( TypeSpecifier^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
       #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
       #name: main   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-         #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-      }
+      #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
       #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
          #return {            ## by peg : ( RETURN^ (Expression^)? SEMI  ) defined in JumpStatement
             #integer: 0   ## by peg : ( (DecimalConstant / HexConstant / OctalConstant) IntegerSuffix?  ) defined in IntegerConstant

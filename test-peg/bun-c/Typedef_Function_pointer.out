@@ -7,8 +7,6 @@ parsed:
    #assign {            ## by peg : ( (Pointer^)? DirectDeclarator^ (EQU Initializer^)?  ) defined in InitDeclarator
       #c.pointer: *   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
       #name: Func   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-      #c.declarationspecifier {            ## by peg : ( ((StorageClassSpecifier / TypeSpecifier / TypeQualifier / FunctionSpecifier / Attribute)^)+  ) defined in DeclarationSpecifiers
-         #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-      }
+      #c.typespecifier: void   ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
    }
 }
