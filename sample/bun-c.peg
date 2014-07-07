@@ -278,11 +278,7 @@ ParameterTypeList
     ;
 
 ParameterList
-    = ParameterDeclaration <<@ (COMMA ParameterDeclaration@) #param >>*
-    ;
-
-ParameterDeclaration
-    = TypeSpecifier <<@ ( Declarator / AbstractDeclarator )@ #c.parameterdeclaration >>?
+    = << TypeSpecifier@ ( Declarator / AbstractDeclarator )@? (COMMA TypeSpecifier@ ( Declarator / AbstractDeclarator )@? )* #param >>
     ;
 
 IdentifierList

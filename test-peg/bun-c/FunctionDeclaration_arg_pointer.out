@@ -3,16 +3,12 @@ parsed:
    #function {            ## by peg : ( TypeSpecifier^ Declarator^ (DeclarationList^)? CompoundStatement^  ) defined in FunctionDefinition
       #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
       #name: main   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-      #param {            ## by peg : ( (COMMA ParameterDeclaration^)  ) defined in ParameterList
-         #c.parameterdeclaration {            ## by peg : ( (Declarator / AbstractDeclarator)^  ) defined in ParameterDeclaration
-            #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-            #name: argc   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         }
-         #c.parameterdeclaration {            ## by peg : ( (Declarator / AbstractDeclarator)^  ) defined in ParameterDeclaration
-            #c.typespecifier: char    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
-            #c.pointer: **   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
-            #name: argv   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
-         }
+      #param {            ## by peg : ( TypeSpecifier^ ((Declarator / AbstractDeclarator)^)? (COMMA TypeSpecifier^ ((Declarator / AbstractDeclarator)^)?)*  ) defined in ParameterList
+         #c.typespecifier: int    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+         #name: argc   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
+         #c.typespecifier: char    ## by peg : ( (VOID / CHAR / SHORT / INT / LONG / FLOAT / DOUBLE / SIGNED / UNSIGNED / BOOL / COMPLEX / StructOrUnionSpecifier / EnumSpecifier)^  ) defined in TypeSpecifier
+         #c.pointer: **   ## by peg : ( (STAR^ (TypeQualifier^)*)+  ) defined in Pointer
+         #name: argv   ## by peg : ( !Keyword IdNondigit^ (IdChar^)* Spacing  ) defined in Identifier
       }
       #block {            ## by peg : ( LWING ((Declaration / Statement)^)* RWING  ) defined in CompoundStatement
          #return {            ## by peg : ( RETURN^ (Expression^)? SEMI  ) defined in JumpStatement
