@@ -454,7 +454,7 @@ public abstract class ParserContext {
 		return left;
 	}
 
-	public PegObject matchTag(PegObject left, PegTag e) {
+	public PegObject matchTag(PegObject left, PegTagging e) {
 		left.tag = e.symbol;
 		return left;
 	}

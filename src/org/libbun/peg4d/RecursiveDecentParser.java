@@ -215,7 +215,7 @@ public class RecursiveDecentParser extends ParserContext {
 			for(int i = 0; i < list.size() -1; i++) {
 				Peg e0 = list.get(i);
 				Peg e1 = list.get(i+1);
-				if(e0 instanceof PegTag) {
+				if(e0 instanceof PegTagging) {
 					if(e1 instanceof PegString) {
 						list.swap(i, i+1);
 					}

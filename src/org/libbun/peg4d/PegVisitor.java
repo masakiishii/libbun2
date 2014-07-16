@@ -14,7 +14,7 @@ public interface PegVisitor {
 	public void visitChoice(PegChoice peg);
 	public void visitSetter(PegSetter peg);
 	public void visitNewObject(PegNewObject peg);
-	public void visitObjectLabel(PegTag peg);
+	public void visitObjectLabel(PegTagging peg);
 	public void visitCatch(PegCatch peg);
 	public void visitIndent(PegIndent peg);
 }

@@ -197,7 +197,7 @@ public final class PegRuleSet {
 			return new PegOptional(toPeg(node.get(0)));
 		}
 		if(node.is("#tag")) {
-			return new PegTag(node.getText());
+			return new PegTagging(node.getText());
 		}
 		if(node.is("#message")) {
 			return new PegMessage(node.getText());
@@ -332,7 +332,7 @@ public final class PegRuleSet {
 		return new PegNot(e);
 	}
 	public static Peg L(String label) {
-		return new PegTag(label);
+		return new PegTagging(label);
 	}
 	public static Peg O(Peg ... elist) {
 		PegNewObject l = new PegNewObject(false);
@@ -412,8 +412,8 @@ public final class PegRuleSet {
 //		  ;
 		Peg _SetterTerm = choice(
 			seq(s("("), opt(n("_")), n("Expr"), opt(n("_")), s(")"), opt(n("Setter"))),
-			seq(O(choice(s("8<"), s("<<"), s("{")), choice(seq(choice(s("^"), s("@")), c(" \\t\\n\\r"), L("#newjoin")), seq(s(""), L("#new"))), 
-					opt(n("_")), set(n("Expr")), opt(n("_")), choice(s(">8"), s(">>"), s("}"))), opt(n("Setter"))),
+			seq(O(choice(s("<<"), s("<{"), s("8<")), choice(seq(choice(s("^"), s("@")), c(" \\t\\n\\r"), L("#newjoin")), seq(s(""), L("#new"))), 
+					opt(n("_")), set(n("Expr")), opt(n("_")), choice(s(">>"), s("}>"), s(">8"))), opt(n("Setter"))),
 			seq(n("RuleName"), opt(n("Setter")))
 		);
 //	Term
@@ -467,7 +467,9 @@ public final class PegRuleSet {
 //	  =  Rule _? ';'
 //	  ;
 //		this.setRule("TopLevel", seq(n("Rule"), opt(n("_")), s(";"), opt(n("_"))));
-		this.setRule("TopLevel", seq(opt(n("_")), choice(n("Rule"), n("Import")), opt(n("_")), s(";")));
+		this.setRule("TopLevel", seq(
+			opt(n("_")), choice(n("Rule"), n("Import")), opt(n("_")), s(";"), opt(n("_"))
+		));
 		this.check();
 		return this;
 	}
