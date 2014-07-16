@@ -108,7 +108,8 @@ ExternalDeclaration
     ;
 
 FunctionDefinition
-    = << DeclarationSpecifiers@3 Declarator@0 DeclarationList@1? CompoundStatement@2 #function >>
+//    = << DeclarationSpecifiers@2 Declarator@0 DeclarationList@1? CompoundStatement@3 #function >>
+    = << DeclarationSpecifiers@2 Declarator@0 LPAR ParameterTypeList@1? RPAR CompoundStatement@3 #function >>
     ;
 
 DeclarationList
@@ -121,11 +122,11 @@ DeclarationList
 //-------------------------------------------------------------------------
 
 Declaration
-    = DeclarationNoAttribute@ (Attribute / Assembler)@? SEMI
+    = DeclarationNoAttribute (Attribute / Assembler)? SEMI
     ;
 
 DeclarationNoAttribute
-    = DeclarationSpecifiers@ InitDeclaratorList@?
+    = DeclarationSpecifiers InitDeclaratorList?
     ;
 
 DeclarationSpecifiers
@@ -149,11 +150,11 @@ DeclarationSpecifiers
     ;
 
 InitDeclaratorList
-    = InitDeclarator@ (COMMA InitDeclarator@)*
+    = InitDeclarator (COMMA InitDeclarator)*
     ;
 
 InitDeclarator
-    = << Pointer@? DirectDeclarator@ (EQU Initializer@)? #assign >>
+    = << Pointer? DirectDeclarator (EQU Initializer)? #assign >>
     ;
 
 
@@ -254,18 +255,18 @@ AttributeParamList = LPAR (AttributeParam@ (COMMA AttributeParam@)*)? RPAR;
 Assembler = ASM LPAR (StringLiteral (COMMA StringLiteral)*)? RPAR;
 
 Declarator
-    = Pointer@? DirectDeclarator@
+    = Pointer@? DirectDeclarator
     ;
 
 DirectDeclarator
-    = ( Identifier@
+    = ( Identifier
       / LPAR Declarator@ RPAR
       )
       ( << LBRK TypeQualifier@* AssignmentExpression@? RBRK #arraysize >>
       / LBRK STATIC@ TypeQualifier@* AssignmentExpression@ RBRK
       / LBRK TypeQualifier@+ STATIC@ AssignmentExpression@ RBRK
       / LBRK TypeQualifier@* STAR@ RBRK
-      / LPAR ParameterTypeList@ RPAR
+//      / LPAR ParameterTypeList@ RPAR
       / LPAR IdentifierList@? RPAR
       )*
     ;
@@ -275,7 +276,7 @@ Pointer
     ;
 
 ParameterTypeList
-    = ParameterList@ (COMMA ELLIPSIS)?
+    = ParameterList <<@ (COMMA ELLIPSIS)? #block >>
     ;
 
 ParameterList
@@ -283,7 +284,7 @@ ParameterList
     ;
 
 ParameterDeclaration
-    = DeclarationSpecifiers <<@ ( Declarator / AbstractDeclarator )@ #c.parameterdeclaration >>?
+    = << DeclarationSpecifiers@1 ( Declarator / AbstractDeclarator )@0? #param >>
     ;
 
 IdentifierList
@@ -314,16 +315,16 @@ TypedefName
     ;
 
 Initializer
-    = (AssignmentExpression@
-    / LWING InitializerList@* COMMA? RWING)
+    = (AssignmentExpression
+    / LWING InitializerList* COMMA? RWING)
     ;
 
 InitializerList
-    = << Designation@? Initializer@ (COMMA Designation@? Initializer@)* #c.initializerlist >>
+    = Designation? Initializer (COMMA Designation? Initializer)*
     ;
 
 Designation
-    = << Designator@+ EQU #c.designation>>
+    = << Designator@+ EQU #c.designation >>
     ;
 
 Designator
@@ -356,7 +357,7 @@ CompoundStatement
     ;
 
 ExpressionStatement
-    = << Expression@? SEMI #c.expressionstatement >>
+    = Expression@? SEMI
     ;
 
 SelectionStatement
@@ -408,7 +409,7 @@ PostfixExpression
       / Index #index
       / DOT #field Identifier@
       / PTR #ptr Identifier@
-      / INC #inc
+      / INC #postinc
       / DEC #dec
       )@ >>*
     ;
@@ -484,7 +485,7 @@ ConditionalExpression
     ;
 
 AssignmentExpression
-    = << UnaryExpression@ AssignmentOperator@ AssignmentExpression@ #assign >>
+    = << UnaryExpression AssignmentOperator AssignmentExpression #assign >>
     / ConditionalExpression
     ;
 
@@ -631,7 +632,8 @@ Keyword
 //  distinct from keywords, but it seems so.
 //-------------------------------------------------------------------------
 
-Identifier = << !Keyword IdNondigit@ IdChar@* Spacing #name >>;
+Identifier = << !Keyword IdNondigit@ IdChar@* #name >> Spacing
+           ;
 
 IdNondigit
     = [a-z] / [A-Z] / [_]
@@ -672,7 +674,7 @@ IntegerConstant
       / HexConstant
       / OctalConstant
       )
-    IntegerSuffix? #integer >> Spacing
+    IntegerSuffix? #int >> Spacing
     ;
 
 DecimalConstant = [1-9][0-9]* ;
