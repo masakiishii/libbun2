@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.libbun.drv.JvmDriver;
+import org.libbun.drv.JsDriver;
 import org.libbun.drv.PegDumpper;
 import org.libbun.peg4d.FileSource;
 import org.libbun.peg4d.JsonPegGenerator;
@@ -203,6 +204,7 @@ public class Main {
 		driverMap.put("jvm-debug", JvmDriver.DebuggableJvmDriver.class);
 		driverMap.put("peg", org.libbun.drv.PegDumpper.class);
 		driverMap.put("json", org.libbun.drv.JsonDriver.class);
+		driverMap.put("js", org.libbun.drv.JsDriver.class);
 	}
 
 	private static BunDriver loadDriverImpl(String driverName) {

@@ -1,3 +1,3 @@
-int main(void) {
-	return 0;
+int f(int n) {
+	return n + 1;
 }
