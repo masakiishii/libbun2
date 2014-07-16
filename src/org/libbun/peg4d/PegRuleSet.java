@@ -174,7 +174,7 @@ public final class PegRuleSet {
 			}
 			return l;
 		}
-		if(node.is("#sequence")) {
+		if(node.is("#PegSequence")) {
 			PegSequence l = new PegSequence();
 			for(int i = 0; i < node.size(); i++) {
 				l.list.add(toPeg(node.get(i)));
@@ -187,13 +187,13 @@ public final class PegRuleSet {
 		if(node.is("#PegAnd")) {
 			return new PegAnd(toPeg(node.get(0)));
 		}
-		if(node.is("#one")) {
+		if(node.is("#PegOneMore")) {
 			return new PegRepeat(toPeg(node.get(0)), 1);
 		}
-		if(node.is("#zero")) {
+		if(node.is("#PegZeroMore")) {
 			return new PegRepeat(toPeg(node.get(0)), 0);
 		}
-		if(node.is("#option")) {
+		if(node.is("#PegOptional")) {
 			return new PegOptional(toPeg(node.get(0)));
 		}
 		if(node.is("#PegTagging")) {
@@ -429,9 +429,9 @@ public final class PegRuleSet {
 		));
 //
 //	SuffixTerm
-//	  = Term <<@ ('*' #zero / '+' #one / '?' #option) >>?
+//	  = Term <<@ ('*' #PegZeroMore / '+' #PegOneMore / '?' #PegOptional) >>?
 //	  ;
-		this.setRule("SuffixTerm", seq(n("Term"), opt(LO(choice(seq(s("*"), L("#zero")), seq(s("+"), L("#one")), seq(s("?"), L("#option")))))));
+		this.setRule("SuffixTerm", seq(n("Term"), opt(LO(choice(seq(s("*"), L("#PegZeroMore")), seq(s("+"), L("#PegOneMore")), seq(s("?"), L("#PegOptional")))))));
 //	Predicated
 //	  = << ('&' #PegAnd / '!' #PegNot) SuffixTerm@ >> / SuffixTerm 
 //	  ;
@@ -446,7 +446,7 @@ public final class PegRuleSet {
 //	Sequence 
 //	  = Predicated <<@ (_ Predicated@)+ #seq >>?
 //	  ;
-		setRule("Sequence", seq(n("Predicate"), opt(LO(L("#sequence"), one(n("_"), set(n("Predicate")))))));
+		setRule("Sequence", seq(n("Predicate"), opt(LO(L("#PegSequence"), one(n("_"), set(n("Predicate")))))));
 //	Choice
 //	  = Sequence <<@ _? ('/' _? Sequence@)+ #PegChoice >>?
 //	  ;
