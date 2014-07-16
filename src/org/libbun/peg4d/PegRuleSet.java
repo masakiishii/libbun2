@@ -155,7 +155,7 @@ public final class PegRuleSet {
 		return e;
 	}	
 	private Peg toPegImpl(PegObject node) {
-		if(node.is("#name")) {
+		if(node.is("#PegNonTerminal")) {
 			return new PegLabel(node.getText());
 		}
 		if(node.is("#PegString")) {
@@ -202,7 +202,7 @@ public final class PegRuleSet {
 		if(node.is("#PegMessage")) {
 			return new PegMessage(node.getText());
 		}
-		if(node.is("#newjoin")) {
+		if(node.is("##PegNewObjectJoin")) {
 			Peg seq = toPeg(node.get(0));
 			PegNewObject o = new PegNewObject(true);
 			if(seq.size() > 0) {
@@ -215,7 +215,7 @@ public final class PegRuleSet {
 			}
 			return o;
 		}
-		if(node.is("#new")) {
+		if(node.is("#PegNewObject")) {
 			Peg seq = toPeg(node.get(0));
 			PegNewObject o = new PegNewObject(false);
 			if(seq.size() > 0) {
@@ -369,9 +369,9 @@ public final class PegRuleSet {
 		this.setRule("_", zero(choice(one(c(" \\t\\n\\r")), Comment)));
 		
 //		RuleName
-//		  = << [A-Za-z_] [A-Za-z0-9_]* #name >>
+//		  = << [A-Za-z_] [A-Za-z0-9_]* #PegNonTerminal >>
 //		  ;
-		this.setRule("RuleName", O(c("A-Za-z_"), zero(c("A-Za-z0-9_")), L("#name")));
+		this.setRule("RuleName", O(c("A-Za-z_"), zero(c("A-Za-z0-9_")), L("#PegNonTerminal")));
 ////	String
 ////	  = "'" << (!"'" .)*  #PegString >> "'"
 ////	  / '"' <<  (!'"' .)* #PegString >> '"'
@@ -407,12 +407,12 @@ public final class PegRuleSet {
 		setRule("Setter", seq(choice(s("^"), s("@")), LO(opt(c("0-9")), L("#PegSetter"))));
 //		SetterTerm
 //		  = '(' Expr ')' Setter?
-//		  / '<<' << ('@' [ \t\n] #newjoin / '' #new) _? Expr@ >> _? '>>' Setter?
+//		  / '<<' << ('@' [ \t\n] ##PegNewObjectJoin / '' #PegNewObject) _? Expr@ >> _? '>>' Setter?
 //		  / RuleName Setter?
 //		  ;
 		Peg _SetterTerm = choice(
 			seq(s("("), opt(n("_")), n("Expr"), opt(n("_")), s(")"), opt(n("Setter"))),
-			seq(O(choice(s("<<"), s("<{"), s("8<")), choice(seq(choice(s("^"), s("@")), c(" \\t\\n\\r"), L("#newjoin")), seq(s(""), L("#new"))), 
+			seq(O(choice(s("<<"), s("<{"), s("8<")), choice(seq(choice(s("^"), s("@")), c(" \\t\\n\\r"), L("##PegNewObjectJoin")), seq(s(""), L("#PegNewObject"))), 
 					opt(n("_")), set(n("Expr")), opt(n("_")), choice(s(">>"), s("}>"), s(">8"))), opt(n("Setter"))),
 			seq(n("RuleName"), opt(n("Setter")))
 		);
