@@ -621,14 +621,6 @@ class PegSequence extends PegList {
 		}
 		return ne;
 	}
-//	public Peg cdr() {
-//		PegSequence seq = new PegSequence(); 
-//		for(int i = 1; i < this.size(); i++) {
-//			Peg e  = this.list.ArrayValues[i];
-//			seq.list.add(e);
-//		}
-//		return seq;
-//	}
 	@Override
 	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);

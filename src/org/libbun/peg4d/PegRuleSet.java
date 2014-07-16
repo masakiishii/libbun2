@@ -158,16 +158,16 @@ public final class PegRuleSet {
 		if(node.is("#name")) {
 			return new PegLabel(node.getText());
 		}
-		if(node.is("#string")) {
+		if(node.is("#PegString")) {
 			return new PegString(UCharset._UnquoteString(node.getText()));
 		}
-		if(node.is("#character")) {
+		if(node.is("#PegCharacter")) {
 			return new PegCharacter(node.getText());
 		}
-		if(node.is("#any")) {
+		if(node.is("#PegAny")) {
 			return new PegAny();
 		}
-		if(node.is("#choice")) {
+		if(node.is("#PegChoice")) {
 			PegChoice l = new PegChoice();
 			for(int i = 0; i < node.size(); i++) {
 				l.list.add(toPeg(node.get(i)));
@@ -199,7 +199,7 @@ public final class PegRuleSet {
 		if(node.is("#tag")) {
 			return new PegTagging(node.getText());
 		}
-		if(node.is("#message")) {
+		if(node.is("#PegMessage")) {
 			return new PegMessage(node.getText());
 		}
 		if(node.is("#newjoin")) {
@@ -373,22 +373,22 @@ public final class PegRuleSet {
 //		  ;
 		this.setRule("RuleName", O(c("A-Za-z_"), zero(c("A-Za-z0-9_")), L("#name")));
 ////	String
-////	  = "'" << (!"'" .)*  #string >> "'"
-////	  / '"' <<  (!'"' .)* #string >> '"'
+////	  = "'" << (!"'" .)*  #PegString >> "'"
+////	  / '"' <<  (!'"' .)* #PegString >> '"'
 ////	  ;
 		Peg _String = choice(
-			seq(s("'"), O(zero(not(s("'")), Any), L("#string")), s("'")),
-			seq(s("\""), O(zero(not(s("\"")), Any), L("#string")), s("\"")),
-			seq(s("`"), O(zero(not(s("`")), Any), L("#message")), s("`"))
+			seq(s("'"), O(zero(not(s("'")), Any), L("#PegString")), s("'")),
+			seq(s("\""), O(zero(not(s("\"")), Any), L("#PegString")), s("\"")),
+			seq(s("`"), O(zero(not(s("`")), Any), L("#PegMessage")), s("`"))
 		);	
 //	Character 
-//	  = "[" <<  (!']' .)* #character >> "]"
+//	  = "[" <<  (!']' .)* #PegCharacter >> "]"
 //	  ;
-		Peg _Character = seq(s("["), O(zero(not(s("]")), Any), L("#character")), s("]"));
+		Peg _Character = seq(s("["), O(zero(not(s("]")), Any), L("#PegCharacter")), s("]"));
 //	Any
-//	  = << '.' #any >>
+//	  = << '.' #PegAny >>
 //	  ;
-		Peg _Any = O(s("."), L("#any"));
+		Peg _Any = O(s("."), L("#PegAny"));
 //	ObjectLabel 
 //	  = << '#' [A-z0-9_.]+ #tag>>
 //	  ;
@@ -448,9 +448,9 @@ public final class PegRuleSet {
 //	  ;
 		setRule("Sequence", seq(n("Predicate"), opt(LO(L("#sequence"), one(n("_"), set(n("Predicate")))))));
 //	Choice
-//	  = Sequence <<@ _? ('/' _? Sequence@)+ #choice >>?
+//	  = Sequence <<@ _? ('/' _? Sequence@)+ #PegChoice >>?
 //	  ;
-		Peg _Choice = seq(n("Sequence"), opt(LO( L("#choice"), one(opt(n("_")), s("/"), opt(n("_")), set(choice(Catch, n("Sequence")))))));
+		Peg _Choice = seq(n("Sequence"), opt(LO( L("#PegChoice"), one(opt(n("_")), s("/"), opt(n("_")), set(choice(Catch, n("Sequence")))))));
 //	Expr
 //	  = Choice
 //	  ;
