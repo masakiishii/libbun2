@@ -108,7 +108,8 @@ ExternalDeclaration
     ;
 
 FunctionDefinition
-    = << DeclarationSpecifiers@3 Declarator@0 DeclarationList@1? CompoundStatement@2 #function >>
+//    = << DeclarationSpecifiers@2 Declarator@0 DeclarationList@1? CompoundStatement@3 #function >>
+    = << DeclarationSpecifiers@2 Declarator@0 LPAR ParameterTypeList@1? RPAR CompoundStatement@3 #function >>
     ;
 
 DeclarationList
@@ -121,11 +122,11 @@ DeclarationList
 //-------------------------------------------------------------------------
 
 Declaration
-    = DeclarationNoAttribute@ (Attribute / Assembler)@? SEMI
+    = DeclarationNoAttribute (Attribute / Assembler)? SEMI
     ;
 
 DeclarationNoAttribute
-    = DeclarationSpecifiers@ InitDeclaratorList@?
+    = DeclarationSpecifiers InitDeclaratorList?
     ;
 
 DeclarationSpecifiers
@@ -254,18 +255,18 @@ AttributeParamList = LPAR (AttributeParam@ (COMMA AttributeParam@)*)? RPAR;
 Assembler = ASM LPAR (StringLiteral (COMMA StringLiteral)*)? RPAR;
 
 Declarator
-    = Pointer@? DirectDeclarator@
+    = Pointer@? DirectDeclarator
     ;
 
 DirectDeclarator
-    = ( Identifier@
+    = ( Identifier
       / LPAR Declarator@ RPAR
       )
       ( << LBRK TypeQualifier@* AssignmentExpression@? RBRK #arraysize >>
       / LBRK STATIC@ TypeQualifier@* AssignmentExpression@ RBRK
       / LBRK TypeQualifier@+ STATIC@ AssignmentExpression@ RBRK
       / LBRK TypeQualifier@* STAR@ RBRK
-      / LPAR ParameterTypeList@ RPAR
+//      / LPAR ParameterTypeList@ RPAR
       / LPAR IdentifierList@? RPAR
       )*
     ;
@@ -275,7 +276,7 @@ Pointer
     ;
 
 ParameterTypeList
-    = ParameterList@ (COMMA ELLIPSIS)?
+    = ParameterList (COMMA ELLIPSIS)?
     ;
 
 ParameterList
