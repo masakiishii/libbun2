@@ -181,10 +181,10 @@ public final class PegRuleSet {
 			}
 			return l;
 		}
-		if(node.is("#not")) {
+		if(node.is("#PegNot")) {
 			return new PegNot(toPeg(node.get(0)));
 		}
-		if(node.is("#and")) {
+		if(node.is("#PegAnd")) {
 			return new PegAnd(toPeg(node.get(0)));
 		}
 		if(node.is("#one")) {
@@ -196,7 +196,7 @@ public final class PegRuleSet {
 		if(node.is("#option")) {
 			return new PegOptional(toPeg(node.get(0)));
 		}
-		if(node.is("#tag")) {
+		if(node.is("#PegTagging")) {
 			return new PegTagging(node.getText());
 		}
 		if(node.is("#PegMessage")) {
@@ -228,7 +228,7 @@ public final class PegRuleSet {
 			}
 			return o;
 		}
-		if(node.is("#setter")) {
+		if(node.is("#PegSetter")) {
 			int index = -1;
 			String indexString = node.getText();
 			if(indexString.length() > 0) {
@@ -390,21 +390,21 @@ public final class PegRuleSet {
 //	  ;
 		Peg _Any = O(s("."), L("#PegAny"));
 //	ObjectLabel 
-//	  = << '#' [A-z0-9_.]+ #tag>>
+//	  = << '#' [A-z0-9_.]+ #PegTagging>>
 //	  ;
-		Peg _Tag = O(s("#"), one(c("A-Za-z0-9_.")), L("#tag"));
+		Peg _Tag = O(s("#"), one(c("A-Za-z0-9_.")), L("#PegTagging"));
 //	Index
-//	  = << [0-9] #index >>
+//	  = << [0-9] #PegIndex >>
 //	  ;
-		Peg _Index = O(c("0-9"), L("#index"));
+		Peg _Index = O(c("0-9"), L("#PegIndex"));
 //		Index
-//		  = << [0-9] #index >>
+//		  = << [0-9] #PegIndex >>
 //		  ;
 		Peg _Pipe = seq(s("|>"), opt(n("_")), O(c("A-Za-z_"), zero(c("A-Za-z0-9_")), L("#pipe")));
 //	Setter
-//	  = '@' <<@ [0-9]? #setter>>
+//	  = '@' <<@ [0-9]? #PegSetter>>
 //	  ;
-		setRule("Setter", seq(choice(s("^"), s("@")), LO(opt(c("0-9")), L("#setter"))));
+		setRule("Setter", seq(choice(s("^"), s("@")), LO(opt(c("0-9")), L("#PegSetter"))));
 //		SetterTerm
 //		  = '(' Expr ')' Setter?
 //		  / '<<' << ('@' [ \t\n] #newjoin / '' #new) _? Expr@ >> _? '>>' Setter?
@@ -433,10 +433,10 @@ public final class PegRuleSet {
 //	  ;
 		this.setRule("SuffixTerm", seq(n("Term"), opt(LO(choice(seq(s("*"), L("#zero")), seq(s("+"), L("#one")), seq(s("?"), L("#option")))))));
 //	Predicated
-//	  = << ('&' #and / '!' #not) SuffixTerm@ >> / SuffixTerm 
+//	  = << ('&' #PegAnd / '!' #PegNot) SuffixTerm@ >> / SuffixTerm 
 //	  ;
 		this.setRule("Predicate",  choice(
-			O(choice(seq(s("&"), L("#and")),seq(s("!"), L("#not"))), set(n("SuffixTerm"))), 
+			O(choice(seq(s("&"), L("#PegAnd")),seq(s("!"), L("#PegNot"))), set(n("SuffixTerm"))), 
 			n("SuffixTerm")
 		));
 //  Catch
