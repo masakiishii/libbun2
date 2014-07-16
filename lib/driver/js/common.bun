@@ -1,0 +1,386 @@
+
+//typedef void;
+typedef NullType;
+typedef boolean;
+typedef int;
+typedef float;
+typedef String;
+
+// type
+
+template #Tvoid(): void {
+	void
+}
+
+template #Tvar() {
+}
+
+template #Tboolean(): boolean {
+	bool
+}
+
+template #Tint8(): int {
+	int
+}
+
+template #Tint16(): int {
+	int
+}
+
+template #Tint32(): int {
+	int
+}
+
+template #Tint64(): int {
+	int
+}
+
+template #Tint(): int {
+	int
+}
+
+template #Tfloat(): float {
+	float
+}
+
+template #Tdouble(): float {
+	float
+}
+
+template #Treal(): float {
+	float
+}
+
+template #cast(x: int) : float {
+	float(${x})
+}
+
+template #conv(x: float) : int {
+	int(${x})
+}
+
+template #TString(): String {
+	unicode
+}
+
+// literal
+
+template #null(): NullType {
+	None
+}
+
+template #true(): boolean {
+	True
+}
+
+template #false(): boolean {
+	False
+}
+
+template #int(): int {
+	${textof this}
+}
+
+template #int32(): int {
+	${textof this}
+}
+
+template #int64(): int {
+	${textof this}
+}
+
+template #float(): float {
+	${textof this}
+}
+
+template #double(): float {
+	${textof this}
+}
+
+template #string(): String {
+	u"${textof this}"
+}
+
+
+template<T> #group(expr :T) :T {
+	(${expr})
+}
+
+template #not(x: boolean) :boolean {
+	not ${x}
+}
+
+
+template #plus(x: float) :float {
+	+${x}
+}
+
+template #plus(x: int) :int {
+	+${x}
+}
+
+template #minus(x: float) :float {
+	-${x}
+}
+
+template #minus(x: int) :int {
+	-${x}
+}
+
+template #compl(x: int) :int {
+	~${x}
+}
+
+template #and(x: boolean, y: boolean): boolean {
+	${x} and ${y}
+}
+
+template #or(x: boolean, y: boolean): boolean {
+	${x} or ${y}
+}
+
+template<T> #assign(x: T, y: T): void {
+	${x} = ${y}
+}
+
+template<T> #add(x: T, y: T) :T {
+	(${x} + ${y})
+}
+
+template #add(x: String, y: any !String): String {
+	(${x} + unicode(${y}))
+}
+
+template<T> #sub(x: T, y: T): T {
+	(${x} - ${y})
+}
+
+template<T> #mul(x: T, y: T): T {
+	(${x} * ${y})
+}
+
+template<T> #div(x: T, y: T): T {
+	(${x} / ${y})
+}
+
+template<T> #mod(x: T, y: T): T {
+	(${x} % ${y})
+}
+
+template<T> #eq(x: T, y: T): boolean {
+	(${x} == ${y})
+}
+
+template<T> #noteq(x: T, y: T): boolean {
+	(${x} != ${y})
+}
+
+template<T> #lt(x: T, y: T): boolean {
+	(${x} < ${y})
+}
+
+template<T> #lte(x: T, y: T): boolean {
+	(${x} <= ${y})
+}
+
+template<T> #gt(x: T, y: T): boolean {
+	(${x} > ${y})
+}
+
+template<T> #gte(x: T, y: T): boolean {
+	(${x} >= ${y})
+}
+
+template #field(o: any, field) {
+	${o}->${textof field}
+}
+
+template #index(o: String, index: int): String {
+	${o}[${index}]
+}
+
+template<T> #index(o: Array<T>, index: int): T {
+	${o}[${index}]
+}
+
+template<T> #let(name, type: T, value: T): void {
+	${name} = ${value}
+}
+
+template<T> #var(name, type: T, value: T): void {
+	${name} = ${value}
+}
+
+template #name() {
+	${textof name}
+}
+
+template #function(name, params, rtype, block): void {
+	function ${name}(${list params}){ ${begin} ${block} ${end}; }
+}
+
+template #param(name, type): void {
+	${name}
+}
+
+template #arguments(*) {
+	(${list this ", "})
+}
+
+template #apply(f, args) {
+	${f}(${list args ", "})
+}
+
+template #return(): void {
+	return
+}
+
+template #return(expr): void {
+	return ${expr}
+}
+
+template #empty(): void {
+}
+
+template #block(*): void {
+	${statement this}
+}
+
+template #block(): void {
+	${newline}pass
+}
+
+template #if(x: bool, then: void): void {
+	if ${x}: ${begin} ${then} ${end}
+}
+
+template #if(x: bool, then: void, else: void): void {
+	if ${x}: ${begin} ${then} ${end}
+	else: ${begin} ${else} ${end}
+}
+
+template #if(x: bool, then: void, elif: #if void): void {
+	if ${x}: ${begin} ${then} ${end}
+	el${elif}
+}
+
+template #while(x: bool, loop: void): void {
+	while ${x}: ${begin} ${statement loop} ${end}
+}
+
+template #break(): void {
+	break
+}
+
+template #continue(): void {
+	continue
+}
+
+template #throw(expr): void {
+	raise ${expr}
+}
+
+template #toplevel(*): void {
+	${statement this}
+}
+
+
+template assert(x: boolean) :void {
+	assert ${x}
+}
+
+template println(x: any) :void {
+	print ${x}
+}
+
+template println(x: String) :void {
+	print ${x}
+}
+
+template #conv(x: boolean): String {
+	(u'true' if ${x} else u'false')
+}
+
+template #conv(x: int): String {
+	unicode(${x})
+}
+
+template #conv(x: float): String {
+	unicode(${x})
+}
+
+// String
+template size(x: String): int {
+	len(${x})
+}
+
+template #size(x: String): int {
+	len(${x})
+}
+
+template #field(o: String, field: 'size'): int {
+	len(${o})
+}
+
+template equals(x: String, y: String): boolean {
+	${x} == ${y}
+}
+
+template startsWith(x: String, y: String): boolean {
+	${x}.startswith(${y})
+}
+
+template endsWith(x: String, y: String): boolean {
+	${x}.endsswith(${y})
+}
+
+template substring(x: String, y: int): String {
+	${x}[${y}:]
+}
+
+template substring(x: String, y: int, z: int): String {
+	${x}[${y}:${z}]
+}
+
+template indexOf(x: String, y: String): int {
+	${x}.find(${y})
+}
+
+template lastIndexOf(x: String, y: String): int {
+	${x}.rfind(${y})
+}
+
+template toUpperCase(x: String): String {
+	${x}.upper()
+}
+
+template toLowerCase(x: String): String {
+	${x}.lower()
+}
+
+/**
+define _ "unicode($[0])": Func<α[],String>
+define size "len($[0])": Func<α[],int>
+define size "@arraysize~libbun_arraysize($[0], $[1], None)": Func<α[],int,void>
+define get "$[0][$[1]]": Func<α[],int,α>
+define set "$[0][$[1]] = $[2]": Func<α[],int,α,void>
+define add "$[0].append($[1])": Func<α[],α,void>
+define insert "$[0].insert($[1], $[2])": Func<α[],int,α,void>
+define remove "$[0].remove($[1])": Func<α[],int,α>
+define pop "$[0].pop($[1])": Func<α[],α>
+define size "@arraysize~libbun_arraysize($[0], $[1], False)": Func<boolean[],int,void>
+define size "@arraysize~libbun_arraysize($[0], $[1], 0)": Func<int[],int,void>
+define size "@arraysize~libbun_arraysize($[0], $[1], 0.0)": Func<float[],int,void>
+define _ "unicode($[0])": Func<Map<α>,String>
+define hasKey "$[0].has_key($[1])": Func<Map<α>,String,boolean>
+define get "$[0][$[1]]": Func<Map<α>,String,α>
+define get "@mapget~libbun_mapget($[0],$[1],$[2])": Func<Map<α>,String,α,α>
+define set "$[0][$[1]] = $[2]": Func<Map<α>,String,α,void>
+define keys "$[0].keys()": Func<Map<α>,String[]>
+define _ "unicode($[0])": Func<Object,String>
+**/
+
+template<T> abs(x: T): T {
+	ABS(${x})
+}
+
