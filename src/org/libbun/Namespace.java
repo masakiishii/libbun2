@@ -14,7 +14,7 @@ public class Namespace extends SymbolTable {
 		this.root = this;
 		this.ruleMap = new UMap<Grammar>();
 		Grammar pegRule = new Grammar();
-		pegRule.loadPegRule();
+		pegRule.loadPegGrammar();
 		this.ruleMap.put("peg", pegRule);
 //		this.ruleMap.put("main", ruleSet);
 		this.driver = driver;

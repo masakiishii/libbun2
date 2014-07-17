@@ -83,25 +83,95 @@ public final class Grammar {
 			}
 		}
 		/* to complete the verification of cyclic rules */
+		PegNormaizer norm = new PegNormaizer();
 		for(int i = 0; i < list.size(); i++) {
 			String ruleName = list.ArrayValues[i];
 			Peg e = this.pegMap.get(ruleName, null);
 			e.verify2(e, this, e.ruleName, null);
+			norm.setRuleName(ruleName);
+			Peg ne = e.clone(norm);
+			if(ne != e) {
+				this.pegMap.put(ruleName, ne);
+			}
 		}
 		if(this.foundError) {
 			Main._Exit(1, "peg error found");
 		}
 	}
 	
-	final void checkCyclicRule(String ruleName, Peg e) {
-		UList<String> list = new UList<String>(new String[100]);
-		UMap<String> set = new UMap<String>();
-		list.add(ruleName);
-		set.put(ruleName, ruleName);
-		if(e.makeList(ruleName, this, list, set)) {
-			e.set(Peg.CyclicRule);
+	class PegNormaizer extends PegTransformer {
+		private String ruleName;
+		void setRuleName(String ruleName) {
+			this.ruleName = ruleName;
 		}
+		@Override
+		public Peg transform(Peg e) {
+			e.ruleName = ruleName;
+			if(e instanceof PegChoice) {
+				return this.flattenChoice((PegChoice)e);
+			}
+			if(e instanceof PegList) {
+				for(int i = 0; i < e.size(); i++) {
+					((PegList) e).list.ArrayValues[i] = e.get(i).clone(this);
+				}
+				return e;
+			}
+			if(e instanceof PegSetter) {
+				return this.flattenSetter((PegSetter)e);
+			}
+			if(e instanceof PegUnary) {
+				((PegUnary) e).innerExpr = ((PegUnary) e).innerExpr.clone(this);
+			}
+			return e;
+		}
+
+		private Peg flattenChoice(PegChoice e) {
+			boolean hasChoice = false;
+			for(int i = 0; i < e.size(); i++) {
+				if(e.get(i) instanceof PegChoice) {
+					hasChoice = true;
+					break;
+				}
+			}
+			if(hasChoice) {
+				UList<Peg> l = new UList<Peg>(new Peg[e.size()*2]);
+				flattenChoiceImpl(e, l);
+				e.list = l;
+			}
+			return e;
+		}
+
+		private void flattenChoiceImpl(PegChoice e, UList<Peg> l) {
+			for(int i = 0; i < e.size(); i++) {
+				Peg sub = e.get(i);
+				if(sub instanceof PegChoice) {
+					this.flattenChoiceImpl((PegChoice)sub, l);
+				}
+				else {
+					l.add(sub);
+				}
+			}
+		}
+
+		private Peg flattenSetter(PegSetter e) {
+			if(!e.innerExpr.is(Peg.HasNewObject)) {
+				return e.innerExpr;
+			}
+			return e;
+		}
+
+		
 	}
+	
+//	final void checkCyclicRule(String ruleName, Peg e) {
+//		UList<String> list = new UList<String>(new String[100]);
+//		UMap<String> set = new UMap<String>();
+//		list.add(ruleName);
+//		set.put(ruleName, ruleName);
+//		if(e.makeList(ruleName, this, list, set)) {
+//			e.set(Peg.CyclicRule);
+//		}
+//	}
 
 	public void addObjectLabel(String objectLabel) {
 		this.objectLabelMap.put(objectLabel, objectLabel);
@@ -109,7 +179,7 @@ public final class Grammar {
 
 	public final boolean loadPegFile(String fileName) {
 		ParserContext p = Main.newParserContext(Main.loadSource(fileName));
-		p.setRuleSet(PegRules);
+		p.setRuleSet(PegGrammar);
 		while(p.hasNode()) {
 			p.initMemo();
 			PegObject node = p.parseNode("TopLevel");
@@ -365,7 +435,7 @@ public final class Grammar {
 		return new PegSetter(e, -1);
 	}
 
-	public Grammar loadPegRule() {
+	public Grammar loadPegGrammar() {
 		Peg Any = new PegAny();
 		Peg NewLine = c("\\r\\n");
 //		Comment
@@ -484,10 +554,11 @@ public final class Grammar {
 			opt(n("_")), choice(n("Rule"), n("Import")), opt(n("_")), s(";"), opt(n("_"))
 		));
 		this.check();
+		this.show("TopLevel");
 		return this;
 	}
 	
-	public final static Grammar PegRules = new Grammar().loadPegRule();
+	public final static Grammar PegGrammar = new Grammar().loadPegGrammar();
 
 }
 
