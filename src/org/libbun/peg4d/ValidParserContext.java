@@ -38,9 +38,9 @@ public class ValidParserContext extends RecursiveDecentParser {
 		this.memoMap = new HashMap<Long, ObjectMemo>();
 	}
 	
-	public PegObject matchLabel(PegObject left, PegLabel e) {
+	public PegObject matchNonTerminal(PegObject left, PegNonTerminal e) {
 		long pos = this.getPosition();
-		ObjectMemo m = this.getMemo(e, pos);
+		ObjectMemo m = this.getMemo(e, pos, false);  //FIXME
 		if(m != null) {
 			if(m.generated == null) {
 				return this.refoundFailure(e, pos+m.consumed);
@@ -48,7 +48,7 @@ public class ValidParserContext extends RecursiveDecentParser {
 			setPosition(pos + m.consumed);
 			return m.generated;
 		}
-		PegObject generated = super.matchLabel(left, e);
+		PegObject generated = super.matchNonTerminal(left, e);
 		if(generated.isFailure()) {
 			this.setMemo(pos, e, null, (int)(generated.startIndex - pos));
 		}

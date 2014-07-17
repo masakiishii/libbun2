@@ -5,7 +5,7 @@ public interface PegVisitor {
 	public void visitPegString(PegString peg);
 	public void visitPegAny(PegAny peg);
 	public void visitPegCharacter(PegCharacter peg);
-	public void visitPegLabel(PegLabel peg);
+	public void visitPegLabel(PegNonTerminal peg);
 	public void visitPegOptional(PegOptional peg);
 	public void visitOneMore(PegRepeat peg);
 	public void visitPegAnd(PegAnd peg);

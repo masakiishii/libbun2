@@ -3,6 +3,7 @@ package org.libbun.peg4d;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import org.libbun.Main;
 import org.libbun.UList;
 
 public class PackratParser extends RecursiveDecentParser {
@@ -18,7 +19,6 @@ public class PackratParser extends RecursiveDecentParser {
 	public ParserContext newParserContext(ParserSource source, long startIndex, long endIndex) {
 		return new PackratParser(source, startIndex, endIndex, this.pegList);
 	}
-
 
 	public void initMemo() {
 //		this.memoMap = new LinkedHashMap<Long, ObjectMemo>(FifoSize) {  //FIFO
@@ -36,22 +36,27 @@ public class PackratParser extends RecursiveDecentParser {
 		this.memoMap = new HashMap<Long, ObjectMemo>();
 	}
 	
-	public PegObject matchLabel(PegObject left, PegLabel e) {
+	public PegObject matchNonTerminal(PegObject left, PegNonTerminal e) {
+		Peg next = this.getRule(e.symbol);
 		long pos = this.getPosition();
-		ObjectMemo m = this.getMemo(e, pos);
+		boolean isRepeated = next.isRepeatedCall(pos);
+		if(Main.VerboseStatCall) {
+			next.countCall(this, e.symbol, pos);
+		}
+		ObjectMemo m = this.getMemo(next, pos, isRepeated);
 		if(m != null) {
 			if(m.generated == null) {
-				return this.refoundFailure(e, pos+m.consumed);
+				return this.refoundFailure(next, pos+m.consumed);
 			}
 			setPosition(pos + m.consumed);
 			return m.generated;
 		}
-		PegObject generated = super.matchLabel(left, e);
+		PegObject generated = next.performMatch(left, this);
 		if(generated.isFailure()) {
-			this.setMemo(pos, e, null, (int)(generated.startIndex - pos));
+			this.setMemo(pos, next, null, (int)(generated.startIndex - pos));
 		}
 		else {
-			this.setMemo(pos, e, generated, (int)(this.getPosition() - pos));
+			this.setMemo(pos, next, generated, (int)(this.getPosition() - pos));
 		}
 		return generated;
 	}

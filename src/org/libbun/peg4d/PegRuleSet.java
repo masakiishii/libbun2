@@ -45,8 +45,8 @@ public final class PegRuleSet {
 			}
 			return newnode;
 		}
-		if(e instanceof PegLabel) {  // self reference
-			if(name.equals(((PegLabel) e).symbol)) {
+		if(e instanceof PegNonTerminal) {  // self reference
+			if(name.equals(((PegNonTerminal) e).symbol)) {
 				Peg defined = this.pegMap.get(name, null);
 				if(defined == null) {
 					e.warning("undefined self reference: " + name);
@@ -126,7 +126,7 @@ public final class PegRuleSet {
 	}
 	
 	private boolean tramsform(ParserContext context, PegObject node) {
-		//System.out.println("DEBUG? parsed: " + node);		
+		System.out.println("DEBUG? parsed: " + node);		
 		if(node.is("#rule")) {
 			String ruleName = node.textAt(0, "");
 			Peg e = toPeg(node.get(1));
@@ -156,7 +156,7 @@ public final class PegRuleSet {
 	}	
 	private Peg toPegImpl(PegObject node) {
 		if(node.is("#PegNonTerminal")) {
-			return new PegLabel(node.getText());
+			return new PegNonTerminal(node.getText());
 		}
 		if(node.is("#PegString")) {
 			return new PegString(UCharset._UnquoteString(node.getText()));
@@ -228,6 +228,19 @@ public final class PegRuleSet {
 			}
 			return o;
 		}
+		if(node.is("#PegExport")) {
+			Peg seq = toPeg(node.get(0));
+			PegList o = new PegNewObject(false);
+			if(seq.size() > 0) {
+				for(int i = 0; i < seq.size(); i++) {
+					o.list.add(seq.get(i));
+				}
+			}
+			else {
+				o.list.add(seq);
+			}
+			return new PegExport(o);
+		}
 		if(node.is("#PegSetter")) {
 			int index = -1;
 			String indexString = node.getText();
@@ -258,7 +271,7 @@ public final class PegRuleSet {
 		if(loc > 0) {
 			prefix = label.substring(0, loc+1);
 			label = label.substring(loc+1);
-			this.pegMap.put(label, new PegLabel(prefix+label));
+			this.pegMap.put(label, new PegNonTerminal(prefix+label));
 		}
 		for(int i = 0; i < list.size(); i++) {
 			String l = list.ArrayValues[i];
@@ -297,7 +310,7 @@ public final class PegRuleSet {
 		return new PegCharacter(charSet);
 	}
 	public static Peg n(String ruleName) {
-		return new PegLabel(ruleName);
+		return new PegNonTerminal(ruleName);
 	}
 	private final static Peg opt(Peg e) {
 		return new PegOptional(e);
@@ -392,15 +405,15 @@ public final class PegRuleSet {
 //	ObjectLabel 
 //	  = << '#' [A-z0-9_.]+ #PegTagging>>
 //	  ;
-		Peg _Tag = O(s("#"), one(c("A-Za-z0-9_.")), L("#PegTagging"));
+		Peg _Tagging = O(s("#"), one(c("A-Za-z0-9_.")), L("#PegTagging"));
 //	Index
 //	  = << [0-9] #PegIndex >>
 //	  ;
 		Peg _Index = O(c("0-9"), L("#PegIndex"));
 //		Index
 //		  = << [0-9] #PegIndex >>
-//		  ;
-		Peg _Pipe = seq(s("|>"), opt(n("_")), O(c("A-Za-z_"), zero(c("A-Za-z0-9_")), L("#pipe")));
+//		Peg _Pipe = seq(s("|>"), opt(n("_")), O(c("A-Za-z_"), zero(c("A-Za-z0-9_")), L("#pipe")));
+		Peg _Export = O(s("<|"), opt(n("_")), set(n("Expr")), opt(n("_")), L("#PegExport"), s("|>"));
 //	Setter
 //	  = '@' <<@ [0-9]? #PegSetter>>
 //	  ;
@@ -425,7 +438,7 @@ public final class PegRuleSet {
 //	  / SetterTerm
 //	  ;
 		setRule("Term", choice(
-			_String, _Character, _Any, _Tag, _Index, _Pipe, _SetterTerm
+			_String, _Character, _Any, _Tagging, _Index, _Export, _SetterTerm
 		));
 //
 //	SuffixTerm
@@ -475,8 +488,6 @@ public final class PegRuleSet {
 	}
 	
 	public final static PegRuleSet PegRules = new PegRuleSet().loadPegRule();
-
-
 
 }
 

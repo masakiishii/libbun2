@@ -87,8 +87,8 @@ public class RecursiveDecentParser extends ParserContext {
 	class PegOptimizer extends PegTransformer {
 		public Peg transform(Peg e) {
 			if(Main.OptimizedLevel > 0) {
-				if(e instanceof PegLabel) {
-					return this.extractInline(((PegLabel) e));
+				if(e instanceof PegNonTerminal) {
+					return this.extractInline(((PegNonTerminal) e));
 				}
 				if(e instanceof PegChoice) {
 					return this.predictChoice(((PegChoice) e));
@@ -110,7 +110,7 @@ public class RecursiveDecentParser extends ParserContext {
 			return null;
 		}
 		
-		private final Peg extractInline(PegLabel label) {
+		private final Peg extractInline(PegNonTerminal label) {
 			String ruleName = label.symbol;
 			Peg next = ruleSet.getRule(ruleName);
 			if(next.is(Peg.CyclicRule) || !isTextMatchOnly(next)) {
@@ -365,19 +365,6 @@ public class RecursiveDecentParser extends ParserContext {
 //	private final Peg getRightJoinRule(String name) {
 //		return this.pegCache.get(this.nameRightJoinName(name), null);
 //	}
-
-	public final PegObject parsePegObject(PegObject parentNode, String ruleName) {
-		Peg e = this.getRule(ruleName);
-		PegObject left = e.performMatch(parentNode, this);
-//		if(left.isFailure()) {
-//			return left;
-//		}
-//		e = this.getRightJoinRule(ruleName);
-//		if(e != null) {
-//			return e.performMatch(left, this);
-//		}
-		return left;
-	}
 	
 	class PegEmpty extends PegOptimized {
 		public PegEmpty(Peg orig) {
@@ -680,20 +667,24 @@ public class RecursiveDecentParser extends ParserContext {
 		m.consumed = consumed;
 		m.next = this.memoMap.get(keypos);
 		this.memoMap.put(keypos, m);
-		this.memoMiss += 1;
 //		if(keypeg == peg) {
 //			System.out.println("cache " + keypos + ", " + keypeg);
 //		}
 	}
 
-	protected final ObjectMemo getMemo(Peg keypeg, long keypos) {
+	protected final ObjectMemo getMemo(Peg keypeg, long keypos, boolean isRepeated) {
 		ObjectMemo m = this.memoMap.get(keypos);
 		while(m != null) {
 			if(m.keypeg == keypeg) {
-				this.memoHit += 1;
+				if(isRepeated) {
+					this.memoHit += 1;
+				}
 				return m;
 			}
 			m = m.next;
+		}
+		if(isRepeated) {
+			this.memoMiss += 1;
 		}
 		return m;
 	}

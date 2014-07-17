@@ -1,5 +1,7 @@
 package org.libbun.peg4d;
 
+import java.util.HashMap;
+
 import org.libbun.Main;
 import org.libbun.UCharset;
 import org.libbun.UList;
@@ -43,7 +45,7 @@ public abstract class Peg {
 	protected abstract void stringfy(UStringBuilder sb, boolean debugMode);
 	protected abstract boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set);
 	protected abstract void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited);
-	protected abstract PegObject simpleMatch(PegObject left, ParserContext context);
+	public abstract PegObject simpleMatch(PegObject left, ParserContext context);
 	public Object getPrediction() {
 		return null;
 	}
@@ -158,6 +160,39 @@ public abstract class Peg {
 		}
 	}
 
+	// statistics 
+	class CallCounter {
+		String ruleName;
+		int total = 0;
+		int repeated = 0;
+	}
+	private HashMap<Long, CallCounter> countMap;
+	private CallCounter statCallCounter;
+	public final void countCall(ParserContext p, String name, long pos) {
+		Long key = pos;
+		if(this.countMap == null) {
+			this.countMap = new HashMap<>();
+			this.statCallCounter = new CallCounter();
+			this.statCallCounter.ruleName = name;
+			p.setCallCounter(this.statCallCounter);
+		}
+		this.statCallCounter.total += 1;
+		CallCounter c = this.countMap.get(key);
+		if(c == null) {
+			this.countMap.put(key, this.statCallCounter);
+		}
+		else {
+			c.repeated += 1;
+		}
+	}
+	public final boolean isRepeatedCall(long pos) {
+		if(this.countMap != null) {
+			CallCounter c = this.countMap.get(pos);
+			return c != null;
+		}
+		return false;
+	}
+	
 }
 
 abstract class PegTransformer {
@@ -297,22 +332,24 @@ class PegCharacter extends PegAtom {
 	}
 }
 
-class PegLabel extends PegAtom {
-	public PegLabel(String ruleName) {
+class PegNonTerminal extends PegAtom {
+	public PegNonTerminal(String ruleName) {
 		super(ruleName);
+		this.set(Peg.HasNonTerminal);
 	}
 	@Override
 	protected Peg clone(PegTransformer tr) {
 		Peg ne = tr.transform(this);
 		if(ne == null) {
-			ne = new PegLabel(this.symbol);
+			ne = new PegNonTerminal(this.symbol);
 			ne.flag = this.flag;
 
 		}
 		return ne;
 	}
-	@Override protected PegObject simpleMatch(PegObject left, ParserContext context) {
-		return context.matchLabel(left, this);
+	@Override
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
+		return context.matchNonTerminal(left, this);
 	}
 	@Override
 	protected boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set) {
@@ -335,7 +372,6 @@ class PegLabel extends PegAtom {
 	@Override
 	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
-		this.set(Peg.HasNonTerminal);
 		Peg next = rules.getRule(this.symbol);
 		if( next == null ) {
 			Main._PrintLine(this.source.formatErrorMessage("error", this.sourcePosition, "undefined label: " + this.symbol));
@@ -352,6 +388,7 @@ class PegLabel extends PegAtom {
 		this.derived(next);
 		startRule.derived(this);
 	}
+
 }
 
 abstract class PegUnary extends Peg {
@@ -372,7 +409,7 @@ abstract class PegUnary extends Peg {
 	}
 	protected abstract String getOperator();
 	@Override
-	protected final void stringfy(UStringBuilder sb, boolean debugMode) {
+	protected void stringfy(UStringBuilder sb, boolean debugMode) {
 		if(this.prefix) {
 			sb.append(this.getOperator());
 		}
@@ -418,7 +455,8 @@ class PegOptional extends PegUnary {
 	protected String getOperator() {
 		return "?";
 	}
-	@Override protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	@Override
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchOptional(left, this);
 	}
 	@Override
@@ -497,7 +535,7 @@ class PegAnd extends PegUnary {
 		}
 	}
 	@Override
-	protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchAnd(left, this);
 	}
 	public Object getPrediction() {
@@ -523,7 +561,7 @@ class PegNot extends PegUnary {
 		return "!";
 	}
 	@Override
-	protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchNot(left, this);
 	}
 	@Override
@@ -630,7 +668,7 @@ class PegSequence extends PegList {
 		return this.get(0).getPrediction();
 	}
 	@Override
-	protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchSequence(left, this);
 	}
 
@@ -674,7 +712,7 @@ class PegChoice extends PegList {
 	}
 	
 	@Override
-	protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchChoice(left, this);
 	}
 	@Override
@@ -791,39 +829,6 @@ class PegMessage extends PegAtom {
 	}
 }
 
-class PegPipe extends PegLabel {
-	public PegPipe(String ruleName) {
-		super(ruleName);
-	}
-	@Override
-	protected Peg clone(PegTransformer tr) {
-		Peg ne = tr.transform(this);
-		if(ne == null) {
-			ne = new PegPipe(this.symbol);
-			ne.flag = this.flag;
-		}
-		return ne;
-	}
-	@Override
-	protected final void stringfy(UStringBuilder sb, boolean debugMode) {
-		if(debugMode) {
-			sb.append("|> ");
-			sb.append(this.symbol);
-		}
-	}
-	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
-		super.verify2(startRule, rules, visitingName, visited);
-		this.set(Peg.HasPipe);
-		startRule.derived(this);
-	}
-
-	@Override
-	public PegObject simpleMatch(PegObject left, ParserContext context) {
-		return context.matchPipe(left, this);
-	}
-}
-
 class PegNewObject extends PegList {
 	boolean leftJoin = false;
 	String nodeName = "noname";
@@ -858,7 +863,7 @@ class PegNewObject extends PegList {
 	}
 
 	@Override
-	protected final void stringfy(UStringBuilder sb, boolean debugMode) {
+	protected void stringfy(UStringBuilder sb, boolean debugMode) {
 		if(debugMode) {
 			if(this.leftJoin) {
 				sb.append("<{^ ");
@@ -891,12 +896,59 @@ class PegNewObject extends PegList {
 	public Object getPrediction() {
 		return this.get(0).getPrediction();
 	}
-
 }
+
+class PegExport extends PegUnary {
+	public PegExport(Peg e) {
+		super(e, false);
+	}
+	@Override
+	protected Peg clone(PegTransformer tr) {
+		Peg ne = tr.transform(this);
+		if(ne == null) {
+			return new PegExport(this.innerExpr.clone(tr));
+		}
+		return ne;
+	}
+	@Override
+	protected final void stringfy(UStringBuilder sb, boolean debugMode) {
+		if(debugMode) {
+			sb.append("<| ");
+		}
+		else {
+			sb.append("( ");
+		}
+		for(int i = 0; i < this.innerExpr.size(); i++) {
+			this.innerExpr.get(i).stringfy(sb, debugMode);
+		}
+		if(debugMode) {
+			sb.append(" |>");
+		}
+		else {
+			sb.append(" )");
+		}
+	}
+	@Override
+	protected String getOperator() {
+		return null;
+	}
+	@Override
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
+		return context.matchExport(left, this);
+	}
+	@Override
+	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+		super.verify2(startRule, rules, visitingName, visited);
+		startRule.derived(this);
+	}
+}
+
+
 
 class PegIndent extends PegAtom {
 	PegIndent() {
 		super("indent");
+		this.set(Peg.HasContext);
 	}
 	@Override
 	protected Peg clone(PegTransformer tr) {
@@ -910,16 +962,75 @@ class PegIndent extends PegAtom {
 	@Override
 	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
-		this.set(Peg.HasContext);
 		startRule.derived(this);
 	}
 	@Override
-	protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchIndent(left, this);
 	}
 }
 
+class PegIndex extends PegAtom {
+	int index;
+	PegIndex(int index) {
+		super(""+index);
+		this.set(Peg.HasContext);
+		this.index = index;
+	}
+	@Override
+	protected Peg clone(PegTransformer tr) {
+		Peg ne = tr.transform(this);
+		if(ne == null) {
+			ne = new PegIndex(this.index);
+			ne.flag = this.flag;
+		}
+		return ne;
+	}
+	@Override
+	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+		super.verify2(startRule, rules, visitingName, visited);
+		startRule.derived(this);
+	}
+	@Override
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
+		return context.matchIndex(left, this);
+	}
+}
+
 // (e / catch e)
+
+class PegPipe extends PegNonTerminal {
+	public PegPipe(String ruleName) {
+		super(ruleName);
+	}
+	@Override
+	protected Peg clone(PegTransformer tr) {
+		Peg ne = tr.transform(this);
+		if(ne == null) {
+			ne = new PegPipe(this.symbol);
+			ne.flag = this.flag;
+		}
+		return ne;
+	}
+	@Override
+	protected final void stringfy(UStringBuilder sb, boolean debugMode) {
+		if(debugMode) {
+			sb.append("|> ");
+			sb.append(this.symbol);
+		}
+	}
+	@Override
+	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+		super.verify2(startRule, rules, visitingName, visited);
+		this.set(Peg.HasPipe);
+		startRule.derived(this);
+	}
+
+	@Override
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
+		return context.matchPipe(left, this);
+	}
+}
 
 class PegCatch extends PegUnary {
 	PegCatch (String ruleName, Peg first) {
@@ -938,7 +1049,7 @@ class PegCatch extends PegUnary {
 		return "catch ";
 	}
 	@Override
-	protected PegObject simpleMatch(PegObject left, ParserContext context) {
+	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchCatch(left, this);
 	}
 	@Override

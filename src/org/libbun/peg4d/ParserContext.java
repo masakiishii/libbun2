@@ -1,6 +1,7 @@
 package org.libbun.peg4d;
 
 import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -9,6 +10,7 @@ import org.libbun.Functor;
 import org.libbun.Main;
 import org.libbun.UCharset;
 import org.libbun.UList;
+import org.libbun.peg4d.Peg.CallCounter;
 
 public abstract class ParserContext {
 	public final          ParserSource source;
@@ -28,7 +30,6 @@ public abstract class ParserContext {
 	}
 	
 	public abstract void setRuleSet(PegRuleSet ruleSet);
-	public abstract PegObject parsePegObject(PegObject left, String key);
 
 	protected final long getPosition() {
 		return this.sourcePosition;
@@ -138,16 +139,18 @@ public abstract class ParserContext {
 		System.out.println(this.source.formatErrorMessage("error", this.sourcePosition, msg));
 		Main._Exit(1, msg);
 	}
-
-	
 	
 	public boolean hasNode() {
 		this.matchZeroMore(UCharset.WhiteSpaceNewLine);
 		return this.sourcePosition < this.endPosition;
 	}
 
-	public PegObject parseNode(String key) {
-		PegObject o = this.parsePegObject(new PegObject("#toplevel"), key);
+	public PegObject parseNode(String startPoint) {
+		Peg start = this.getRule(startPoint);
+		if(start == null) {
+			Main._Exit(1, "undefined start rule: " + startPoint );
+		}
+		PegObject o = start.simpleMatch(new PegObject("#toplevel"), this);
 		if(o.isFailure()) {
 			o = this.newErrorObject();
 		}
@@ -184,6 +187,16 @@ public abstract class ParserContext {
 		return this.foundFailureNode;
 	}
 
+	public abstract Peg getRule(String symbol);
+
+	public PegObject matchNonTerminal(PegObject left, PegNonTerminal e) {
+		Peg next = this.getRule(e.symbol);
+		if(Main.VerboseStatCall) {
+			next.countCall(this, e.symbol, this.getPosition());
+		}
+		return next.performMatch(left, this);
+	}
+
 	public final PegObject matchString(PegObject left, PegString e) {
 		if(this.match(e.symbol)) {
 			return left;
@@ -208,9 +221,7 @@ public abstract class ParserContext {
 		return this.foundFailure(e);
 	}
 
-	public PegObject matchLabel(PegObject left, PegLabel e) {
-		return this.parsePegObject(left, e.symbol);
-	}
+
 
 	public PegObject matchOptional(PegObject left, PegOptional e) {
 		long pos = this.getPosition();
@@ -444,6 +455,34 @@ public abstract class ParserContext {
 		this.popNewObject(newnode, startIndex, markerId);
 		return newnode;
 	}
+	
+	long statExportCount = 0;
+	long statExportSize  = 0;
+	long statExportFailure  = 0;
+
+	public PegObject matchExport(PegObject left, PegExport e) {
+		PegObject pego = e.innerExpr.simpleMatch(left, this);
+		if(!pego.isFailure()) {
+			this.statExportCount += 1;
+			this.statExportSize += pego.length;
+			this.pushBlockingQueue(pego);
+		}
+		else {
+			this.statExportFailure += 1;
+		}
+		return left;
+	}
+
+	private BlockingQueue<PegObject> queue = null; 
+	protected void pushBlockingQueue(PegObject pego) {
+		if(this.queue != null) {
+			try {
+				this.queue.put(pego);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public PegObject matchSetter(PegObject left, PegSetter e) {
 		PegObject node = e.innerExpr.performMatch(left, this);
@@ -539,15 +578,24 @@ public abstract class ParserContext {
 	}
 	
 	public PegObject matchIndent(PegObject left, PegIndent e) {
-		if(left.source != null) {
-			String indent = left.source.getIndentText(left.startIndex);
-			//System.out.println("###" + indent + "###");
-			if(this.match(indent)) {
+		String indent = left.source.getIndentText(left.startIndex);
+		//System.out.println("###" + indent + "###");
+		if(this.match(indent)) {
+			return left;
+		}
+		return this.foundFailure(e);
+	}
+
+	public PegObject matchIndex(PegObject left, PegIndex e) {
+		String text = left.textAt(e.index, null);
+		if(text != null) {
+			if(this.match(text)) {
 				return left;
 			}
 		}
-		return left;
+		return this.foundFailure(e);
 	}
+
 
 	public PegObject matchCatch(PegObject left, PegCatch e) {
 		e.innerExpr.performMatch(left, this);
@@ -567,6 +615,15 @@ public abstract class ParserContext {
 	long usedMemory;
 	int statOptimizedPeg = 0;
 	
+	private UList<CallCounter> statCallCounterList = null;
+
+	void setCallCounter(CallCounter c) {
+		if(this.statCallCounterList == null) {
+			this.statCallCounterList = new UList<CallCounter>(new CallCounter[100]);
+		}
+		this.statCallCounterList.add(c);
+	}
+		
 	public void beginStatInfo() {
 		System.gc(); // meaningless ?
 		this.statBacktrackSize = 0;
@@ -658,6 +715,7 @@ public abstract class ParserContext {
 			System.out.println("backtrack raito: " + ratio((double)this.statBacktrackSize / statCharLength) + " backtrack: " + this.statBacktrackSize + " length: " + this.source.length() + ", consumed: " + statCharLength);
 			System.out.println("backtrack_count: " + this.statBacktrackCount + " average: " + ratio((double)this.statBacktrackSize / this.statBacktrackCount) + " worst: " + this.statWorstBacktrack);
 			System.out.println("created_object: " + this.statObjectCount + ", used_object: " + parsedObject.count() + " object_logs: " + maxLog);
+			System.out.println("exported_object: " + this.statExportCount + ", exported_size: " + this.statExportSize + " exported_failure: " + this.statExportFailure);
 			System.out.println("memo hit: " + this.memoHit + ", miss: " + this.memoMiss + 
 					", ratio: " + ratio(((double)this.memoHit / (this.memoHit+this.memoMiss))) + ", consumed memo:" + this.memoSize);
 			long total = Runtime.getRuntime().totalMemory() / 1024;
@@ -667,9 +725,29 @@ public abstract class ParserContext {
 			used =  used - usedMemory;
 			statCharLength = statCharLength / 1024;
 			System.out.println("used: " + used + "KiB/ " + (used/1024) + "MiB,  heap/length: " + (double) used/ statCharLength);
+			this.showCallCounterList();
 			System.out.println();
 		}
 	}
+
+	protected long statCallCounter  = 0;
+	protected long statCallRepeated = 0;
+	
+	private void showCallCounterList() {
+		if(this.statCallCounterList != null) {
+			for(int i = 0; i < this.statCallCounterList.size(); i++) {
+				CallCounter c = this.statCallCounterList.ArrayValues[i];
+				statCallCounter += c.total;
+				statCallRepeated += c.repeated;
+				if(Main.VerboseStat) {
+					System.out.println("\t"+c.ruleName+" calls: " + c.total + " repeated: " + c.repeated + " r/c: " + ratio((double)c.repeated/c.total));
+				}
+			}
+		}
+		System.out.println("calls: " + statCallCounter + " repeated: " + statCallRepeated + " r/c: " + ratio((double)statCallRepeated/statCallCounter));
+	}
+
+
 	
 }
 

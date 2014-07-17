@@ -3,7 +3,9 @@ package org.libbun.peg4d;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.libbun.Main;
 import org.libbun.UList;
+import org.libbun.peg4d.RecursiveDecentParser.ObjectMemo;
 
 public class Peg4DParser extends RecursiveDecentParser {
 
@@ -36,7 +38,11 @@ public class Peg4DParser extends RecursiveDecentParser {
 	
 	public PegObject matchNewObject(PegObject left, PegNewObject e) {
 		long pos = this.getPosition();
-		ObjectMemo m = this.getMemo(e, pos);
+		boolean isRepeated = e.isRepeatedCall(pos);
+		if(Main.VerboseStatCall) {
+			e.countCall(this, "object", pos);
+		}
+		ObjectMemo m = this.getMemo(e, pos, isRepeated);
 		if(m != null) {
 			if(m.generated == null) {
 				return this.refoundFailure(e, pos+m.consumed);

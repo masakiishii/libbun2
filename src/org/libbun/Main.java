@@ -14,6 +14,7 @@ import org.libbun.drv.PegDumpper;
 import org.libbun.peg4d.FileSource;
 import org.libbun.peg4d.JsonPegGenerator;
 import org.libbun.peg4d.PackratParser;
+import org.libbun.peg4d.Peg;
 import org.libbun.peg4d.Peg4DParser;
 import org.libbun.peg4d.ParserContext;
 import org.libbun.peg4d.PegObject;
@@ -68,6 +69,7 @@ public class Main {
 	
 	// --verbose:stat
 	public static boolean VerboseStat = false;
+	public static boolean VerboseStatCall = false;
 
 	// --parser
 	public static String ParserType = "--parser";
@@ -142,10 +144,11 @@ public class Main {
 				else if(argument.equals("--verbose:stat")) {
 					VerboseStat = true;
 				}
-				else if(argument.equals("--verbose:peg")) {
-					VerbosePeg = true;
+				else if(argument.equals("--verbose:stat2")) {
+					VerboseStat = true;
+					VerboseStatCall = true;
 				}
-				else if(argument.equals("--verbose:optimized")) {
+				else if(argument.equals("--verbose:peg")) {
 					VerbosePeg = true;
 				}
 				else {
@@ -320,7 +323,7 @@ public class Main {
 			gamma.initParserRuleSet(context, "main");
 			driver.startTransaction(OutputFileName);
 			while(context.hasNode()) {
-				node = context.parsePegObject(new PegObject("#toplevel"), startPoint);
+				node = context.parseNode(startPoint);
 					if(context.hasChar()) {
 						System.out.println(ValidParserContext.InvalidLine);
 						//System.out.println("** uncosumed: '" + context + "' **");
