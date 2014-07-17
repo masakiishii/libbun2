@@ -2,6 +2,7 @@ package org.libbun;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -446,7 +447,8 @@ public class Main {
 		InputStream Stream = Main.class.getResourceAsStream("/" + fileName);
 		if (Stream == null) {
 			try {
-				if(BigDataOption) {
+				File f = new File(fileName);
+				if(f.length() < 128 * 1024) {
 					return new FileSource(fileName);
 				}
 				Stream = new FileInputStream(fileName);

@@ -48,7 +48,7 @@ public class FileSource extends ParserSource {
 			this.buffer = new byte[PageSize];
 		}
 		this.readMainBuffer(this.buffer_offset);
-		this.debug = new StringSource(fileName);
+		//this.debug = new StringSource(fileName);
 	}
 	public final long length() {
 		return this.fileLength;
