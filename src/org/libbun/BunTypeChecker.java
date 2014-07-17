@@ -132,7 +132,7 @@ public class BunTypeChecker {
 	class NameChecker extends TypeChecker {
 		@Override
 		public PegObject check(SymbolTable gamma, PegObject node, boolean isStrongTyping) {
-			String name = node.getText();
+			String name = node.getText().trim();
 			NameFunctor f = getName(gamma, name);
 			if(f != null) {
 				node.matched = f;

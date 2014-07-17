@@ -225,7 +225,7 @@ public class PegObject {
 			sb.append(this.formatSourceMessage("syntax error", this.info()));
 		}
 		else if(this.AST == null) {
-			sb.appendNewLine(this.tag+ ": '''", this.getText(), "'''" + this.info());
+			sb.appendNewLine(this.tag+ ": '''", this.getText().trim(), "'''" + this.info());
 		}
 		else {
 			sb.appendNewLine(this.tag);

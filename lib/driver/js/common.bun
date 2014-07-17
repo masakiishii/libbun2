@@ -216,7 +216,7 @@ template #name() {
 }
 
 template #function(name, params, rtype, block): void {
-	function ${name}(${list params}){ ${begin} ${block} ${end}; }
+	function ${name}(${list params}) { ${begin} ${block} ${end};}
 }
 
 template #param(name, type): void {
@@ -251,21 +251,16 @@ template #block(): void {
 }
 
 template #if(x: bool, then: void): void {
-	if ${x}: ${begin} ${then} ${end}
+	if ${x} { ${begin} ${then} ${end} }
 }
 
 template #if(x: bool, then: void, else: void): void {
-	if ${x}: ${begin} ${then} ${end}
-	else: ${begin} ${else} ${end}
-}
-
-template #if(x: bool, then: void, elif: #if void): void {
-	if ${x}: ${begin} ${then} ${end}
-	el${elif}
+	if ${x} { ${begin} ${then} ${end} }
+	else { ${begin} ${else} ${end} }
 }
 
 template #while(x: bool, loop: void): void {
-	while ${x}: ${begin} ${statement loop} ${end}
+	while ${x} { ${begin} ${statement loop} ${end} }
 }
 
 template #break(): void {
