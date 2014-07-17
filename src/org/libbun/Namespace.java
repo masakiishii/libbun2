@@ -1,10 +1,10 @@
 package org.libbun;
 
 import org.libbun.peg4d.ParserContext;
-import org.libbun.peg4d.PegRuleSet;
+import org.libbun.peg4d.Grammar;
 
 public class Namespace extends SymbolTable {
-	public UMap<PegRuleSet> ruleMap;
+	public UMap<Grammar> ruleMap;
 	public UList<String>   exportSymbolList;
 	public BunDriver  driver;
 	public BunTypeChecker checker;
@@ -12,8 +12,8 @@ public class Namespace extends SymbolTable {
 	public Namespace(BunDriver driver) {
 		super(null);
 		this.root = this;
-		this.ruleMap = new UMap<PegRuleSet>();
-		PegRuleSet pegRule = new PegRuleSet();
+		this.ruleMap = new UMap<Grammar>();
+		Grammar pegRule = new Grammar();
 		pegRule.loadPegRule();
 		this.ruleMap.put("peg", pegRule);
 //		this.ruleMap.put("main", ruleSet);
@@ -34,10 +34,10 @@ public class Namespace extends SymbolTable {
 	}
 	
 
-	public final PegRuleSet loadPegFile(String ruleNs, String fileName) {
-		PegRuleSet rules = this.ruleMap.get(fileName);
+	public final Grammar loadPegFile(String ruleNs, String fileName) {
+		Grammar rules = this.ruleMap.get(fileName);
 		if(rules == null) {
-			rules = new PegRuleSet();
+			rules = new Grammar();
 			rules.loadPegFile(fileName);
 			this.ruleMap.get(fileName);
 		}
@@ -47,10 +47,10 @@ public class Namespace extends SymbolTable {
 		return rules;
 	}
 	
-	public final PegRuleSet getRuleSet(String ruleNs) {
-		PegRuleSet p = this.ruleMap.get(ruleNs);
+	public final Grammar getRuleSet(String ruleNs) {
+		Grammar p = this.ruleMap.get(ruleNs);
 		if(p == null) {
-			p = new PegRuleSet();
+			p = new Grammar();
 			p.loadPegFile("lib/peg/" + ruleNs + ".peg");
 			this.ruleMap.put(ruleNs, p);
 		}
@@ -61,7 +61,7 @@ public class Namespace extends SymbolTable {
 		if(lang == null) {
 			lang = this.guessLang(context.source.fileName, "bun");
 		}
-		PegRuleSet ruleSet = this.getRuleSet(lang);
+		Grammar ruleSet = this.getRuleSet(lang);
 		context.setRuleSet(ruleSet);
 	}
 

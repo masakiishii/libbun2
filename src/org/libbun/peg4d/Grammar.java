@@ -5,13 +5,13 @@ import org.libbun.UCharset;
 import org.libbun.UList;
 import org.libbun.UMap;
 
-public final class PegRuleSet {
+public final class Grammar {
 	UMap<Peg>           pegMap;
 	UMap<String>        objectLabelMap = null;
 	boolean             lrExistence = false;
 	public boolean      foundError = false;
 	
-	public PegRuleSet() {
+	public Grammar() {
 		this.pegMap = new UMap<Peg>();
 		this.pegMap.put("indent", new PegIndent());  // default rule
 	}
@@ -126,7 +126,7 @@ public final class PegRuleSet {
 	}
 	
 	private boolean tramsform(ParserContext context, PegObject node) {
-		System.out.println("DEBUG? parsed: " + node);		
+		//System.out.println("DEBUG? parsed: " + node);		
 		if(node.is("#rule")) {
 			String ruleName = node.textAt(0, "");
 			Peg e = toPeg(node.get(1));
@@ -263,7 +263,7 @@ public final class PegRuleSet {
 		if(Main.VerbosePeg) {
 			System.out.println("importing " + fileName);
 		}
-		PegRuleSet p = new PegRuleSet();
+		Grammar p = new Grammar();
 		p.loadPegFile(fileName);
 		UList<String> list = p.makeList(label);
 		String prefix = "";
@@ -365,7 +365,7 @@ public final class PegRuleSet {
 		return new PegSetter(e, -1);
 	}
 
-	public PegRuleSet loadPegRule() {
+	public Grammar loadPegRule() {
 		Peg Any = new PegAny();
 		Peg NewLine = c("\\r\\n");
 //		Comment
@@ -487,7 +487,7 @@ public final class PegRuleSet {
 		return this;
 	}
 	
-	public final static PegRuleSet PegRules = new PegRuleSet().loadPegRule();
+	public final static Grammar PegRules = new Grammar().loadPegRule();
 
 }
 

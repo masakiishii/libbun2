@@ -38,11 +38,7 @@ public class Peg4DParser extends RecursiveDecentParser {
 	
 	public PegObject matchNewObject(PegObject left, PegNewObject e) {
 		long pos = this.getPosition();
-		boolean isRepeated = e.isRepeatedCall(pos);
-		if(Main.VerboseStatCall) {
-			e.countCall(this, "object", pos);
-		}
-		ObjectMemo m = this.getMemo(e, pos, isRepeated);
+		ObjectMemo m = this.getMemo(e, pos);
 		if(m != null) {
 			if(m.generated == null) {
 				return this.refoundFailure(e, pos+m.consumed);

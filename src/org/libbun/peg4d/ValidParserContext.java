@@ -40,7 +40,7 @@ public class ValidParserContext extends RecursiveDecentParser {
 	
 	public PegObject matchNonTerminal(PegObject left, PegNonTerminal e) {
 		long pos = this.getPosition();
-		ObjectMemo m = this.getMemo(e, pos, false);  //FIXME
+		ObjectMemo m = this.getMemo(e, pos);
 		if(m != null) {
 			if(m.generated == null) {
 				return this.refoundFailure(e, pos+m.consumed);

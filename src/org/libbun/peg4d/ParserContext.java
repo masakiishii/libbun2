@@ -16,7 +16,7 @@ public abstract class ParserContext {
 	public final          ParserSource source;
 	protected long        sourcePosition = 0;
 	public    long        endPosition;
-	public    PegRuleSet ruleSet = null;
+	public    Grammar ruleSet = null;
 	
 	long statBacktrackCount = 0;
 	long statBacktrackSize = 0;
@@ -29,7 +29,7 @@ public abstract class ParserContext {
 		this.endPosition = endIndex;
 	}
 	
-	public abstract void setRuleSet(PegRuleSet ruleSet);
+	public abstract void setRuleSet(Grammar ruleSet);
 
 	protected final long getPosition() {
 		return this.sourcePosition;
@@ -146,6 +146,7 @@ public abstract class ParserContext {
 	}
 
 	public PegObject parseNode(String startPoint) {
+		this.initMemo();
 		Peg start = this.getRule(startPoint);
 		if(start == null) {
 			Main._Exit(1, "undefined start rule: " + startPoint );

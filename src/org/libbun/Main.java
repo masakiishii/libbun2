@@ -18,7 +18,7 @@ import org.libbun.peg4d.Peg;
 import org.libbun.peg4d.Peg4DParser;
 import org.libbun.peg4d.ParserContext;
 import org.libbun.peg4d.PegObject;
-import org.libbun.peg4d.PegRuleSet;
+import org.libbun.peg4d.Grammar;
 import org.libbun.peg4d.ParserSource;
 import org.libbun.peg4d.RecursiveDecentParser;
 import org.libbun.peg4d.StringSource;
@@ -354,7 +354,7 @@ public class Main {
 						line = line.substring(loc+1);
 					}
 					else {
-						PegRuleSet p = gamma.root.getRuleSet("main");
+						Grammar p = gamma.root.getRuleSet("main");
 						p.show(line.substring(1));
 						startPoint = null;
 					}

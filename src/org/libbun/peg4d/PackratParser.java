@@ -36,20 +36,52 @@ public class PackratParser extends RecursiveDecentParser {
 		this.memoMap = new HashMap<Long, ObjectMemo>();
 	}
 	
-	public PegObject matchNonTerminal(PegObject left, PegNonTerminal e) {
-		Peg next = this.getRule(e.symbol);
-		long pos = this.getPosition();
-		boolean isRepeated = next.isRepeatedCall(pos);
-		if(Main.VerboseStatCall) {
-			next.countCall(this, e.symbol, pos);
+	public PegObject matchNonTerminal(PegObject left, PegNonTerminal label) {
+		if(Main.OptimizedLevel == 0) {
+			return this.matchNonTerminal0(left, label);  // it has bugs
 		}
-		ObjectMemo m = this.getMemo(next, pos, isRepeated);
+		else {
+			return this.matchNonTerminal1(left, label);
+		}
+	}
+	
+	public PegObject matchNonTerminal0(PegObject left, PegNonTerminal label) {
+		Peg next = this.getRule(label.symbol);
+		long pos = this.getPosition();
+		ObjectMemo m = this.getMemo(label, pos);
 		if(m != null) {
 			if(m.generated == null) {
-				return this.refoundFailure(next, pos+m.consumed);
+				return this.refoundFailure(label, pos+m.consumed);
 			}
 			setPosition(pos + m.consumed);
 			return m.generated;
+		}
+		if(Main.VerboseStatCall) {
+			next.countCall(this, label.symbol, pos);
+		}
+		PegObject generated = next.performMatch(left, this);
+		if(generated.isFailure()) {
+			this.setMemo(pos, label, null, (int)(generated.startIndex - pos));
+		}
+		else {
+			this.setMemo(pos, label, generated, (int)(this.getPosition() - pos));
+		}
+		return generated;
+	}
+
+	public PegObject matchNonTerminal1(PegObject left, PegNonTerminal label) {
+		Peg next = this.getRule(label.symbol);
+		long pos = this.getPosition();
+		ObjectMemo m = this.getMemo(next, pos);
+		if(m != null) {
+			if(m.generated == null) {
+				return this.refoundFailure(label, pos+m.consumed);
+			}
+			setPosition(pos + m.consumed);
+			return m.generated;
+		}
+		if(Main.VerboseStatCall) {
+			next.countCall(this, label.symbol, pos);
 		}
 		PegObject generated = next.performMatch(left, this);
 		if(generated.isFailure()) {

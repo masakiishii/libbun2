@@ -34,7 +34,7 @@ public class RecursiveDecentParser extends ParserContext {
 	}
 	
 	@Override
-	public void setRuleSet(PegRuleSet ruleSet) {
+	public void setRuleSet(Grammar ruleSet) {
 		this.ruleSet = ruleSet;
 		this.pegCache = new UMap<Peg>();
 		this.pegList = new UList<Peg>(new Peg[this.ruleSet.pegMap.size()]);
@@ -672,20 +672,16 @@ public class RecursiveDecentParser extends ParserContext {
 //		}
 	}
 
-	protected final ObjectMemo getMemo(Peg keypeg, long keypos, boolean isRepeated) {
+	protected final ObjectMemo getMemo(Peg keypeg, long keypos) {
 		ObjectMemo m = this.memoMap.get(keypos);
 		while(m != null) {
 			if(m.keypeg == keypeg) {
-				if(isRepeated) {
-					this.memoHit += 1;
-				}
+				this.memoHit += 1;
 				return m;
 			}
 			m = m.next;
 		}
-		if(isRepeated) {
-			this.memoMiss += 1;
-		}
+		this.memoMiss += 1;
 		return m;
 	}
 	

@@ -43,8 +43,8 @@ public abstract class Peg {
 	
 	protected abstract Peg clone(PegTransformer tr);
 	protected abstract void stringfy(UStringBuilder sb, boolean debugMode);
-	protected abstract boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set);
-	protected abstract void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited);
+	protected abstract boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set);
+	protected abstract void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited);
 	public abstract PegObject simpleMatch(PegObject left, ParserContext context);
 	public Object getPrediction() {
 		return null;
@@ -217,11 +217,11 @@ abstract class PegAtom extends Peg {
 		sb.append(this.symbol);
 	}	
 	@Override
-	protected boolean makeList(String startRule, PegRuleSet rules, UList<String> list, UMap<String> set) {
+	protected boolean makeList(String startRule, Grammar rules, UList<String> list, UMap<String> set) {
 		return false;
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		this.ruleName = visitingName;
 	}
 	@Override
@@ -259,7 +259,7 @@ class PegString extends PegAtom {
 		sb.append(PegString.quoteString(this.symbol));
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasString);
 		startRule.derived(this);
@@ -291,7 +291,7 @@ class PegAny extends PegAtom {
 		return context.matchAny(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasAny);
 		startRule.derived(this);
@@ -322,7 +322,7 @@ class PegCharacter extends PegAtom {
 		return context.matchCharacter(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasCharacter);
 		startRule.derived(this);
@@ -352,7 +352,7 @@ class PegNonTerminal extends PegAtom {
 		return context.matchNonTerminal(left, this);
 	}
 	@Override
-	protected boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set) {
+	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 		boolean cyclic = false;
 		if(startRule.equals(this.symbol)) {
 			cyclic = true;
@@ -370,7 +370,7 @@ class PegNonTerminal extends PegAtom {
 		return cyclic;
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		Peg next = rules.getRule(this.symbol);
 		if( next == null ) {
@@ -426,11 +426,11 @@ abstract class PegUnary extends Peg {
 		}
 	}
 	@Override
-	protected boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set) {
+	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 		return this.innerExpr.makeList(startRule, parser, list, set);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		this.ruleName = visitingName;
 		this.innerExpr.verify2(startRule, rules, visitingName, visited);
 		this.derived(this.innerExpr);
@@ -460,7 +460,7 @@ class PegOptional extends PegUnary {
 		return context.matchOptional(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasOptional);
 		startRule.derived(this);
@@ -487,7 +487,7 @@ class PegRepeat extends PegUnary {
 		return (this.atleast > 0) ? "+" : "*";
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasRepetation);
 		startRule.derived(this);
@@ -524,7 +524,7 @@ class PegAnd extends PegUnary {
 		return "&";
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasAnd);
 		startRule.derived(this);
@@ -565,7 +565,7 @@ class PegNot extends PegUnary {
 		return context.matchNot(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasNot);
 		startRule.derived(this);
@@ -622,7 +622,7 @@ abstract class PegList extends Peg {
 		}
 	}
 	@Override
-	protected boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set) {
+	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 		boolean cyclic = false;
 		for(int i = 0; i < this.size(); i++) {
 			if(this.get(i).makeList(startRule, parser, list, set)) {
@@ -632,7 +632,7 @@ abstract class PegList extends Peg {
 		return cyclic;
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		this.ruleName = visitingName;
 		for(int i = 0; i < this.size(); i++) {
 			Peg e  = this.get(i);
@@ -660,7 +660,7 @@ class PegSequence extends PegList {
 		return ne;
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		startRule.derived(this);
 	}
@@ -716,7 +716,7 @@ class PegChoice extends PegList {
 		return context.matchChoice(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasChoice);
 		startRule.derived(this);
@@ -752,7 +752,7 @@ class PegSetter extends PegUnary {
 		return context.matchSetter(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasSetter);
 		startRule.derived(this);
@@ -788,7 +788,7 @@ class PegTagging extends PegAtom {
 		return context.matchTag(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		//rules.addObjectLabel(this.symbol);
 		this.set(Peg.HasTagging);
@@ -822,7 +822,7 @@ class PegMessage extends PegAtom {
 		return context.matchMessage(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasMessage);
 		startRule.derived(this);
@@ -888,7 +888,7 @@ class PegNewObject extends PegList {
 		return context.matchNewObject(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasNewObject);
 		startRule.derived(this);
@@ -937,7 +937,7 @@ class PegExport extends PegUnary {
 		return context.matchExport(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		startRule.derived(this);
 	}
@@ -960,7 +960,7 @@ class PegIndent extends PegAtom {
 		return ne;
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		startRule.derived(this);
 	}
@@ -987,7 +987,7 @@ class PegIndex extends PegAtom {
 		return ne;
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		startRule.derived(this);
 	}
@@ -1020,7 +1020,7 @@ class PegPipe extends PegNonTerminal {
 		}
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasPipe);
 		startRule.derived(this);
@@ -1053,7 +1053,7 @@ class PegCatch extends PegUnary {
 		return context.matchCatch(left, this);
 	}
 	@Override
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		this.set(Peg.HasCatch);
 		startRule.derived(this);
@@ -1077,13 +1077,13 @@ abstract class PegOptimized extends Peg {
 	protected void stringfy(UStringBuilder sb, boolean debugMode) {
 		this.orig.stringfy(sb, debugMode);
 	}
-	protected void verify2(Peg startRule, PegRuleSet rules, String visitingName, UMap<String> visited) {
+	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		this.ruleName = visitingName;
 		this.orig.verify2(startRule, rules, visitingName, visited);
 		this.derived(this.orig);
 	}
 	@Override
-	protected boolean makeList(String startRule, PegRuleSet parser, UList<String> list, UMap<String> set) {
+	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 		return false;
 	}
 
