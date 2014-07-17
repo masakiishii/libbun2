@@ -464,7 +464,10 @@ public class Main {
 				builder.append("\n");
 				line = reader.readLine();
 			}
-			return new StringSource(fileName, 1, builder.toString());
+			StringSource s = new StringSource(fileName, 1, builder.toString());
+//			StringSource s2 = new StringSource(fileName);
+//			System.out.println("@@@@ " + s.length() + ", " + s2.length());
+			return s;
 		}
 		catch(IOException e) {
 			e.printStackTrace();

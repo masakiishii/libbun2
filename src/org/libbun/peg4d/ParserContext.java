@@ -66,10 +66,7 @@ public abstract class ParserContext {
 	}
 
 	protected final char getChar() {
-		if(this.hasChar()) {
-			return this.source.charAt(this.sourcePosition);
-		}
-		return '\0';
+		return this.charAt(this.sourcePosition);
 	}
 	
 	public String substring(long startIndex, long endIndex) {
@@ -78,7 +75,6 @@ public abstract class ParserContext {
 		}
 		return "";
 	}
-
 
 	protected final void consume(long plus) {
 		this.sourcePosition = this.sourcePosition + plus;

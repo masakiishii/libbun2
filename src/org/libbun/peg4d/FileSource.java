@@ -48,7 +48,7 @@ public class FileSource extends ParserSource {
 			this.buffer = new byte[PageSize];
 		}
 		this.readMainBuffer(this.buffer_offset);
-		//this.debug = new StringSource(fileName);
+		this.debug = new StringSource(fileName);
 	}
 	public final long length() {
 		return this.fileLength;
@@ -76,7 +76,7 @@ public class FileSource extends ParserSource {
 		if(this.debug != null) {
 			char c2 = this.debug.charAt(n);
 			if(c != c2) {
-				Main._Exit(1, "different pos=" + n + "c='"+c+"', c2='"+c2+"'");
+				Main._Exit(1, "different " + this.fileName + " pos=" + n + "c='"+(int)c+"', c2='"+(int)c2+"'");
 			}
 		}
 		return c;
@@ -114,7 +114,7 @@ public class FileSource extends ParserSource {
 			if(!s.equals(s2)) {
 				System.out.println("s1: " + s);
 				System.out.println("s2: " + s2);
-				Main._Exit(1, "wrong");
+				Main._Exit(1, "different " + this.fileName + " pos=" + startIndex + " end=" + endIndex);
 			}
 		}
 		return s;
@@ -162,20 +162,21 @@ public class FileSource extends ParserSource {
 			while(start < end) {
 				long offset = this.buffer_alignment(start);
 				if(this.buffer_offset != offset) {
+					this.buffer_offset = offset;
 					this.readMainBuffer(offset);
 				}
 				int start_off = (int)(start - offset);
-				int end_off = (int)(end - offset);
+				int end_off = (int)(end - offset);				
 				if(end_off <= PageSize) {
 					int len = end_off - start_off;
-					System.arraycopy(this.buffer, (int)start_off, buf, copied, len);
+					System.arraycopy(this.buffer, start_off, buf, copied, len);
 					copied += len;
 					assert(copied == buf.length);
 					return;
 				}
 				else {
 					int len = PageSize - start_off;
-					System.arraycopy(this.buffer, (int)start_off, buf, copied, len);
+					System.arraycopy(this.buffer, start_off, buf, copied, len);
 					copied += len;
 					start += len;
 				}

@@ -13,7 +13,7 @@ public class StringSource extends ParserSource {
 		super(fileName, linenum);
 		this.sourceText = sourceText;
 	}
-	StringSource(String fileName) {
+	public StringSource(String fileName) {
 		super(fileName, 1);
 		try {
 			RandomAccessFile f = new RandomAccessFile(fileName, "r");
