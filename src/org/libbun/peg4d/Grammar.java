@@ -13,7 +13,7 @@ public final class Grammar {
 	
 	public Grammar() {
 		this.pegMap = new UMap<Peg>();
-		this.pegMap.put("indent", new PegIndent());  // default rule
+		this.pegMap.put("indent", new PegIndent(0));  // default rule
 	}
 
 	public final boolean hasRule(String ruleName) {
@@ -70,6 +70,7 @@ public final class Grammar {
 			e.verify2(e, this, ruleName, visited);
 			visited.clear();
 			if(Main.VerbosePeg) {
+				
 				if(e.is(Peg.HasNewObject)) {
 					ruleName = "object " + ruleName; 
 				}
@@ -79,7 +80,7 @@ public final class Grammar {
 				if(e.is(Peg.CyclicRule)) {
 					ruleName += "*"; 
 				}
-				System.out.println(e.toPrintableString(ruleName, "\n  = ", "\n  / ", "\n  ;", true));
+				System.out.println(e.format(ruleName));
 			}
 		}
 		/* to complete the verification of cyclic rules */
@@ -120,7 +121,7 @@ public final class Grammar {
 				return this.flattenSetter((PegSetter)e);
 			}
 			if(e instanceof PegUnary) {
-				((PegUnary) e).innerExpr = ((PegUnary) e).innerExpr.clone(this);
+				((PegUnary) e).inner = ((PegUnary) e).inner.clone(this);
 			}
 			return e;
 		}
@@ -154,8 +155,8 @@ public final class Grammar {
 		}
 
 		private Peg flattenSetter(PegSetter e) {
-			if(!e.innerExpr.is(Peg.HasNewObject)) {
-				return e.innerExpr;
+			if(!e.inner.is(Peg.HasNewObject)) {
+				return e.inner;
 			}
 			return e;
 		}
@@ -319,12 +320,12 @@ public final class Grammar {
 			}
 			return new PegSetter(toPeg(node.get(0)), index);
 		}
-		if(node.is("#pipe")) {
-			return new PegPipe(node.getText());
-		}
-		if(node.is("#catch")) {
-			return new PegCatch(null, toPeg(node.get(0)));
-		}
+//		if(node.is("#pipe")) {
+//			return new PegPipe(node.getText());
+//		}
+//		if(node.is("#catch")) {
+//			return new PegCatch(null, toPeg(node.get(0)));
+//		}
 		Main._Exit(1, "undefined peg: " + node);
 		return null;
 	}
@@ -367,7 +368,7 @@ public final class Grammar {
 		for(int i = 0; i < list.size(); i++) {
 			String name = list.ArrayValues[i];
 			Peg e = this.getRule(name);
-			String rule = e.toPrintableString(name, "\n  = ", "\n  / ", "\n  ;", true);
+			String rule = e.format(name);
 			System.out.println(rule);
 		}
 	}

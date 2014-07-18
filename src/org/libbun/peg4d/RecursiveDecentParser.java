@@ -77,7 +77,7 @@ public class RecursiveDecentParser extends ParserContext {
 			return true;
 		}
 		if(e instanceof PegString) {
-			if(((PegString) e).symbol.length() == 1) {
+			if(((PegString) e).text.length() == 1) {
 				return true;
 			}
 		}
@@ -97,7 +97,7 @@ public class RecursiveDecentParser extends ParserContext {
 					return this.predictNewObject(((PegNewObject) e));
 				}
 				if(e instanceof PegUnary) {
-					Peg inner = ((PegUnary) e).innerExpr;
+					Peg inner = ((PegUnary) e).inner;
 					if(e instanceof PegNot) {
 						return peepNot(e, inner.clone(this));
 					}
@@ -256,7 +256,7 @@ public class RecursiveDecentParser extends ParserContext {
 		
 		public Peg peepHoleTransform(Peg e) {
 			if(e instanceof PegString) {
-				String symbol = ((PegString) e).symbol;
+				String symbol = ((PegString) e).text;
 				if(symbol.length() == 1) {
 					log(e, "string1: " + e);
 					return new PegString1(e, symbol);
@@ -268,10 +268,10 @@ public class RecursiveDecentParser extends ParserContext {
 				return null;
 			}
 			if(e instanceof PegOptional) {
-				Peg inner = ((PegOptional) e).innerExpr;
+				Peg inner = ((PegOptional) e).inner;
 				if(inner instanceof PegString) {
 					log(e, "optional string: " + e);
-					return new PegOptionalString(e, ((PegString) inner).symbol);
+					return new PegOptionalString(e, ((PegString) inner).text);
 				}
 				if(inner instanceof PegCharacter) {
 					log(e, "optional character: " + e);
@@ -280,7 +280,7 @@ public class RecursiveDecentParser extends ParserContext {
 			}
 			if(e instanceof PegRepeat) {
 				PegRepeat re = (PegRepeat)e;
-				Peg inner = re.innerExpr;
+				Peg inner = re.inner;
 				if(inner instanceof PegCharacter) {
 					UCharset charset = ((PegCharacter) inner).charset;
 					Peg ne = null;
@@ -324,7 +324,7 @@ public class RecursiveDecentParser extends ParserContext {
 		private final Peg peepNot(Peg orig, Peg inner) {
 			if(inner instanceof PegString) {
 				log(orig, "not string:" + inner);
-				return new PegNotString(orig, ((PegString) inner).symbol);
+				return new PegNotString(orig, ((PegString) inner).text);
 			}
 			if(inner instanceof PegString1) {
 				log(orig, "not string1: " + inner);

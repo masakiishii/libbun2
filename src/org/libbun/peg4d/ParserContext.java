@@ -195,7 +195,7 @@ public abstract class ParserContext {
 	}
 
 	public final PegObject matchString(PegObject left, PegString e) {
-		if(this.match(e.symbol)) {
+		if(this.match(e.text)) {
 			return left;
 		}
 		return this.foundFailure(e);
@@ -223,7 +223,7 @@ public abstract class ParserContext {
 	public PegObject matchOptional(PegObject left, PegOptional e) {
 		long pos = this.getPosition();
 		int markerId = this.pushNewMarker();
-		PegObject parsedNode = e.innerExpr.performMatch(left, this);
+		PegObject parsedNode = e.inner.performMatch(left, this);
 		if(parsedNode.isFailure()) {
 			this.popBack(markerId);
 			this.rollback(pos);
@@ -239,7 +239,7 @@ public abstract class ParserContext {
 		while(this.hasChar()) {
 			long pos = this.getPosition();
 			markerId = this.pushNewMarker();
-			PegObject node = e.innerExpr.performMatch(prevNode, this);
+			PegObject node = e.inner.performMatch(prevNode, this);
 			if(node.isFailure()) {
 				assert(pos == this.getPosition());
 				if(count < e.atleast) {
@@ -269,7 +269,7 @@ public abstract class ParserContext {
 		PegObject node = left;
 		long pos = this.getPosition();
 		int markerId = this.pushNewMarker();
-		node = e.innerExpr.performMatch(node, this);
+		node = e.inner.performMatch(node, this);
 		this.popBack(markerId);
 		this.rollback(pos);
 		return node;
@@ -279,7 +279,7 @@ public abstract class ParserContext {
 		PegObject node = left;
 		long pos = this.getPosition();
 		int markerId = this.pushNewMarker();
-		node = e.innerExpr.performMatch(node, this);
+		node = e.inner.performMatch(node, this);
 		this.popBack(markerId);
 		this.rollback(pos);
 		if(node.isFailure()) {
@@ -407,9 +407,6 @@ public abstract class ParserContext {
 				for(int i = entryList.size() - 1; i >= 0; i--) {
 					ObjectLog l = entryList.ArrayValues[i];
 					newnode.set(l.index, l.childNode);
-					if(l.childNode.is("#lazy")) {
-						this.parseLazyObject(l.childNode);
-					}
 					l.childNode = null;
 				}
 				newnode.checkNullEntry();
@@ -458,7 +455,7 @@ public abstract class ParserContext {
 	long statExportFailure  = 0;
 
 	public PegObject matchExport(PegObject left, PegExport e) {
-		PegObject pego = e.innerExpr.simpleMatch(left, this);
+		PegObject pego = e.inner.simpleMatch(left, this);
 		if(!pego.isFailure()) {
 			this.statExportCount += 1;
 			this.statExportSize += pego.length;
@@ -482,7 +479,7 @@ public abstract class ParserContext {
 	}
 
 	public PegObject matchSetter(PegObject left, PegSetter e) {
-		PegObject node = e.innerExpr.performMatch(left, this);
+		PegObject node = e.inner.performMatch(left, this);
 		if(node.isFailure() || left == node) {
 			return node;
 		}
@@ -499,79 +496,6 @@ public abstract class ParserContext {
 		left.optionalToken = e.symbol;
 		left.startIndex = this.getPosition();
 		return left;
-	}
-
-	public PegObject matchPipe(PegObject left, PegPipe e) {
-		left.tag = "#lazy";
-		left.optionalToken = e.symbol;
-		if(left.source instanceof FileSource) {
-			left.source = left.source.trim(left.startIndex, left.startIndex + left.length);
-			left.startIndex = 0;
-			left.length = (int)left.source.length();
-		}
-		this.parseLazyObject(left);
-		return left;
-	}
-
-	public abstract ParserContext newParserContext(ParserSource source, long startIndex, long endIndex);
-	
-	private static final int ThreadSiza = 2;
-	private ExecutorService threadPool = null;
-	private int taskCount = 0;
-	public void parseLazyObject(PegObject left) {
-		if(threadPool == null) {
-			threadPool = Executors.newFixedThreadPool(ThreadSiza);
-//			parserPool = new ParserContext[ThreadSiza];
-//			for(int i = 0; i < ThreadSiza; i++) {
-//			}
-		}
-		if(left.optionalToken != null) {
-			//System.out.println("pipe: " + left.optionalToken);
-			threadPool.execute(new Task(taskCount, this, left, left.optionalToken));
-			taskCount += 1;
-		}
-		else {
-			System.out.println("pipe null: " + left);
-		}
-	}
-	
-	class Task implements Runnable {
-		int taskId;
-		ParserContext parser;
-		PegObject left;
-		String    pipe;
-		Task(int taskId, ParserContext parser, PegObject left, String pipe) {
-			this.taskId = taskId;
-			this.parser = parser;
-			this.left = left;
-			this.pipe = pipe;
-		}
-		public void run(){
-			try {
-				ParserContext sub = parser.newParserContext(left.source, left.startIndex, left.startIndex + left.length);
-				if(Main.VerbosePeg) {
-					//sub.beginStatInfo();
-					//System.out.println("[" + this.taskId + "] start parsing: " + left);
-				}
-				//System.out.println("thread pipe: " + this.pipe);
-				PegObject newone = sub.parseNode(this.pipe);
-				left.tag = newone.tag;
-				left.AST = newone.AST;
-				//left.optionalToken = newone.optionalToken;
-//				parent.replace(left, newone);
-				if(Main.VerbosePeg) {
-					//System.out.println("[" + this.taskId + "] end parsing: " + newone);
-					//sub.endStatInfo(newone);
-				}
-				sub = null;
-			}
-			catch (RuntimeException e) {
-				e.printStackTrace();
-				Main._Exit(1, "bugs");
-			}
-			this.parser = null;
-			this.left = null;
-	   }
 	}
 	
 	public PegObject matchIndent(PegObject left, PegIndent e) {
@@ -593,11 +517,10 @@ public abstract class ParserContext {
 		return this.foundFailure(e);
 	}
 
-
-	public PegObject matchCatch(PegObject left, PegCatch e) {
-		e.innerExpr.performMatch(left, this);
-		return left;
-	}
+//	public PegObject matchCatch(PegObject left, PegCatch e) {
+//		e.inner.performMatch(left, this);
+//		return left;
+//	}
 
 	public void initMemo() {
 		// TODO Auto-generated method stub
@@ -680,17 +603,17 @@ public abstract class ParserContext {
 
 	public void endStatInfo(PegObject parsedObject) {
 		long awaitTime = 0;
-		if(this.threadPool != null) {
-			this.threadPool.shutdown();
-			awaitTime = System.currentTimeMillis();
-			try {
-				this.threadPool.awaitTermination(60000, TimeUnit.MILLISECONDS);
-				awaitTime = (System.currentTimeMillis() - awaitTime);
-				this.threadPool = null;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+//		if(this.threadPool != null) {
+//			this.threadPool.shutdown();
+//			awaitTime = System.currentTimeMillis();
+//			try {
+//				this.threadPool.awaitTermination(60000, TimeUnit.MILLISECONDS);
+//				awaitTime = (System.currentTimeMillis() - awaitTime);
+//				this.threadPool = null;
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
 		statErapsedTime = (System.currentTimeMillis() - statErapsedTime);
 		System.gc(); // meaningless ?
 		if(Main.VerboseStat) {
