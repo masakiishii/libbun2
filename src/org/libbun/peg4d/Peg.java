@@ -46,9 +46,32 @@ public abstract class Peg {
 	protected abstract boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set);
 	protected abstract void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited);
 	public abstract PegObject simpleMatch(PegObject left, ParserContext context);
+	
 	public Object getPrediction() {
 		return null;
 	}
+
+	public final boolean isPredictablyAcceptable(char ch) {
+		Object predicted = this.getPrediction();
+		if(predicted != null) {
+			if(predicted instanceof String) {
+				String p = (String)predicted;
+				if(p.charAt(0) == ch) {
+					return true;
+				}
+				return false;
+			}
+			if(predicted instanceof UCharset) {
+				UCharset p = (UCharset)predicted;
+				if(p.match(ch)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+
 //	public abstract void accept(PegVisitor visitor);
 
 	public final boolean is(int uflag) {
@@ -138,6 +161,26 @@ public abstract class Peg {
 		}
 	}
 
+	public final static Peg appendAsChoice(Peg e, Peg e1) {
+		if(e == null) {
+			return e1;
+		}
+		if(e1 == null) {
+			return e;
+		}
+		if(e instanceof PegChoice) {
+			((PegChoice) e).extend(e1);
+			return e;
+		}
+		else {
+			PegChoice choice = new PegChoice(0);
+			choice.extend(e);
+			choice.extend(e1);
+			return choice;
+		}
+	}
+
+	
 	public final PegChoice appendAsChoice(Peg e) {
 		if(this instanceof PegChoice) {
 			((PegChoice)this).extend(e);
@@ -197,8 +240,8 @@ class PegNoTransformer extends PegTransformer {
 	}
 }
 
-abstract class PegAtom extends Peg {
-	public PegAtom (int flag) {
+abstract class PegTerm extends Peg {
+	public PegTerm (int flag) {
 		super();
 		this.flag = flag;
 	}
@@ -220,7 +263,7 @@ abstract class PegAtom extends Peg {
 	}
 }
 
-class PegNonTerminal extends PegAtom {
+class PegNonTerminal extends PegTerm {
 	String symbol;
 	public PegNonTerminal(int flag, String ruleName) {
 		super(flag | Peg.HasNonTerminal);
@@ -284,7 +327,7 @@ class PegNonTerminal extends PegAtom {
 	}
 }
 
-class PegString extends PegAtom {
+class PegString extends PegTerm {
 	String text;
 	public PegString(int flag, String text) {
 		super(Peg.HasString | flag);
@@ -312,15 +355,19 @@ class PegString extends PegAtom {
 		startRule.derived(this);
 	}
 	public Object getPrediction() {
-		return this.text;
+		if(this.text.length() > 0) {
+			return this.text;
+		}
+		return null;
 	}
+	
 	@Override
 	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchString(left, this);
 	}
 }
 
-class PegAny extends PegAtom {
+class PegAny extends PegTerm {
 	public PegAny(int flag) {
 		super(Peg.HasAny | flag);
 	}
@@ -350,7 +397,7 @@ class PegAny extends PegAtom {
 	}
 }
 
-class PegCharacter extends PegAtom {
+class PegCharacter extends PegTerm {
 	UCharset charset;
 	public PegCharacter(int flag, String token) {
 		super(Peg.HasCharacter | flag);
@@ -693,14 +740,63 @@ class PegChoice extends PegList {
 		fmt.formatChoice(sb, this);
 	}
 	
+	protected int predictable = -1;
+	protected UCharset predicted = null;
+	protected int pretextSize = 0; 
+	
+	public Object getPrediction() {
+		if(this.predictable == -1) {
+			UCharset u = new UCharset("");
+			this.predictable = 0;
+			this.predicted = null;
+			this.pretextSize = 100000;
+			for(int i = 0; i < this.size(); i++) {
+				Object p = this.get(i).getPrediction();
+				if(p instanceof UCharset) {
+					u.append((UCharset)p);
+					this.predictable += 1;
+					this.pretextSize = 1;
+				}
+				if(p instanceof String) {
+					String text = (String)p;
+					if(text.length() > 0) {
+						u.append(text.charAt(0));
+						this.predictable += 1;
+						if(text.length() < this.pretextSize) {
+							this.pretextSize = text.length();
+						}
+					}
+				}
+			}
+			if(this.predictable == this.size()) {
+				this.predicted = u;
+			}
+			else {
+				this.pretextSize = 0;
+			}
+		}
+		return this.predicted;
+	}
+	
 	@Override
 	public PegObject simpleMatch(PegObject left, ParserContext context) {
 		return context.matchChoice(left, this);
 	}
+	
 	@Override
 	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		startRule.derived(this);
+		if(visited == null) {  // in the second phase
+			this.predictable = -1;
+			this.predicted = null; // reset
+			if(this.getPrediction() == null) {
+				rules.statUnpredictableChoice += 1;
+			}
+			else {
+				rules.statPredictableChoice += 1;
+			}
+		}
 	}
 }
 
@@ -740,7 +836,7 @@ class PegSetter extends PegUnary {
 	}
 }
 
-class PegTagging extends PegAtom {
+class PegTagging extends PegTerm {
 	String symbol;
 	public PegTagging(int flag, String tagName) {
 		super(Peg.HasTagging | flag);
@@ -773,7 +869,7 @@ class PegTagging extends PegAtom {
 	}
 }
 
-class PegMessage extends PegAtom {
+class PegMessage extends PegTerm {
 	String symbol;
 	public PegMessage(int flag, String message) {
 		super(flag | Peg.HasMessage);
@@ -888,7 +984,7 @@ class PegExport extends PegUnary {
 	}
 }
 
-class PegIndent extends PegAtom {
+class PegIndent extends PegTerm {
 	PegIndent(int flag) {
 		super(flag | Peg.HasContext);
 	}
@@ -915,7 +1011,7 @@ class PegIndent extends PegAtom {
 	}
 }
 
-class PegIndex extends PegAtom {
+class PegIndex extends PegTerm {
 	int index;
 	PegIndex(int flag, int index) {
 		super(flag | Peg.HasContext);

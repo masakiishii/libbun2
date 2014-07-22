@@ -601,19 +601,10 @@ public abstract class ParserContext {
 		return mpx(num) + Punit(unit);
 	}
 
+
+	
+	
 	public void endStatInfo(PegObject parsedObject) {
-		long awaitTime = 0;
-//		if(this.threadPool != null) {
-//			this.threadPool.shutdown();
-//			awaitTime = System.currentTimeMillis();
-//			try {
-//				this.threadPool.awaitTermination(60000, TimeUnit.MILLISECONDS);
-//				awaitTime = (System.currentTimeMillis() - awaitTime);
-//				this.threadPool = null;
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
 		statErapsedTime = (System.currentTimeMillis() - statErapsedTime);
 		System.gc(); // meaningless ?
 		if(Main.VerboseStat) {
@@ -640,11 +631,9 @@ public abstract class ParserContext {
 					", ratio: " + ratio(((double)this.memoHit / (this.memoHit+this.memoMiss))) + ", consumed memo:" + this.memoSize);
 			long total = Runtime.getRuntime().totalMemory() / 1024;
 			long free =  Runtime.getRuntime().freeMemory() / 1024;
-			long used =  total - free;
-			System.out.println("heap: " + used + "KiB/ " + (used/1024) + "MiB");
-			used =  used - usedMemory;
-			statCharLength = statCharLength / 1024;
-			System.out.println("used: " + used + "KiB/ " + (used/1024) + "MiB,  heap/length: " + (double) used/ statCharLength);
+			long heap =  total - free;
+			long used =  heap - usedMemory;
+			System.out.println("heap: " + KMunit(heap, "KiB", "MiB") + " used: " + KMunit(used, "KiB", "MiB") + " heap/file: " + ratio((double) heap/ (statFileLength / 1024)));
 			this.showCallCounterList();
 			System.out.println();
 		}

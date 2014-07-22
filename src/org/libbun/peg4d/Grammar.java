@@ -8,8 +8,10 @@ import org.libbun.UMap;
 public final class Grammar {
 	UMap<Peg>           pegMap;
 	UMap<String>        objectLabelMap = null;
-	boolean             lrExistence = false;
 	public boolean      foundError = false;
+	
+	int statUnpredictableChoice = 0;
+	int statPredictableChoice = 0;
 	
 	public Grammar() {
 		this.pegMap = new UMap<Peg>();
@@ -61,6 +63,8 @@ public final class Grammar {
 	public final void check() {
 		this.objectLabelMap = new UMap<String>();
 		this.foundError = false;
+		this.statUnpredictableChoice = 0;
+		this.statPredictableChoice = 0;
 		UList<String> list = this.pegMap.keys();
 		UMap<String> visited = new UMap<String>();
 		for(int i = 0; i < list.size(); i++) {
@@ -70,7 +74,6 @@ public final class Grammar {
 			e.verify2(e, this, ruleName, visited);
 			visited.clear();
 			if(Main.VerbosePeg) {
-				
 				if(e.is(Peg.HasNewObject)) {
 					ruleName = "object " + ruleName; 
 				}
@@ -94,6 +97,9 @@ public final class Grammar {
 			if(ne != e) {
 				this.pegMap.put(ruleName, ne);
 			}
+		}
+		if(Main.VerbosePeg) {
+			System.out.println("Choice predictable: " + this.statPredictableChoice + " unpredictable: " + this.statUnpredictableChoice);
 		}
 		if(this.foundError) {
 			Main._Exit(1, "peg error found");

@@ -76,7 +76,7 @@ class PegFormatter {
 		if(prefix != null) {
 			sb.append(prefix);
 		}
-		if(e.inner instanceof PegAtom || e.inner instanceof PegNewObject) {
+		if(e.inner instanceof PegTerm || e.inner instanceof PegNewObject) {
 			e.inner.stringfy(sb, this);
 		}
 		else {
