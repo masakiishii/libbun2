@@ -128,6 +128,9 @@ public class Main {
 				if(argument.equals("-O4")) {
 					OptimizedLevel = 4;  // experimental
 				}
+				if(argument.equals("-O5")) {
+					OptimizedLevel = 5;  // experimental
+				}
 			}
 			else if (argument.equals("-i")) {
 				ShellMode = true;

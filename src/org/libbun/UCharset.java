@@ -22,6 +22,21 @@ public class UCharset {
 	public final String toString() {
 		return this.text;
 	}
+
+	public final boolean hasChar(char ch) {
+		if(ch < 128) {
+			return this.asciiBitMap[ch];
+		}
+		if(this.utfBitMap != null) {
+			return this.utfBitMap.hasKey(Main._CharToString(ch));
+		}
+		return false;
+	}
+
+	public final boolean hasUnicode() {
+		return this.utfBitMap != null;
+	}
+	
 	
 	public final boolean match(char ch) {
 		if(ch < 128) {
@@ -32,6 +47,7 @@ public class UCharset {
 		}
 		return false;
 	}
+	
 
 	final void set(char ch) {
 		if(ch < 128) {

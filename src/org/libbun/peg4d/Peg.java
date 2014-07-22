@@ -265,6 +265,7 @@ abstract class PegTerm extends Peg {
 
 class PegNonTerminal extends PegTerm {
 	String symbol;
+	Object predicted = null;
 	public PegNonTerminal(int flag, String ruleName) {
 		super(flag | Peg.HasNonTerminal);
 		this.symbol = ruleName;
@@ -302,6 +303,10 @@ class PegNonTerminal extends PegTerm {
 		}
 		this.derived(next);
 		startRule.derived(this);
+	}
+	@Override
+	public Object getPrediction() {
+		return this.predicted;
 	}
 	@Override
 	public PegObject simpleMatch(PegObject left, ParserContext context) {

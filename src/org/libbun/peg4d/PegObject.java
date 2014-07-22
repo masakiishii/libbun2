@@ -41,7 +41,7 @@ public class PegObject {
 		return this.tag.equals(functor);
 	}
 
-	public final boolean equals(PegObject o) {
+	public final boolean equals2(PegObject o) {
 		if(this != o) {
 			if(this.startIndex == o.startIndex && this.length == o.length) {
 				if(this.tag == null) {
@@ -55,9 +55,9 @@ public class PegObject {
 					}
 				}
 			}
-			if(Main.VerbosePeg) {
+//			if(Main.VerbosePeg) {
 				System.out.println("@@diff: " + this.startIndex + "+" + this.length + this.tag + "  " + o.startIndex + "+" + o.length + o.tag);
-			}
+//			}
 			return false;
 		}
 		return true;
