@@ -5,6 +5,7 @@ import org.libbun.Functor;
 import org.libbun.Main;
 import org.libbun.SourceBuilder;
 import org.libbun.SymbolTable;
+import org.libbun.UCharset;
 
 public class PegObject {
 	Peg                    createdPeg = null;
@@ -248,18 +249,13 @@ public class PegObject {
 			sb.append(this.formatSourceMessage("syntax error", this.info()));
 		}
 		else if(this.AST == null) {
-			sb.appendNewLine(this.tag+ ": '''", this.getText(), "'''" + this.info());
+			sb.appendNewLine("{"+ this.tag+ " ", UCharset._QuoteString('\'', this.getText(), '\''), "}");
 		}
 		else {
-			sb.appendNewLine(this.tag);
-			sb.openIndent("{" + this.info());
+			sb.appendNewLine("");
+			sb.openIndent("{" + this.tag);
 			for(int i = 0; i < this.size(); i++) {
-				if(this.AST[i] != null) {
-					this.AST[i].stringfy(sb);
-				}
-				else {
-					sb.appendNewLine("@missing subnode at " + i);
-				}
+				this.AST[i].stringfy(sb);
 			}
 			sb.closeIndent("}");
 		}
