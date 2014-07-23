@@ -275,11 +275,11 @@ Pointer
     ;
 
 ParameterTypeList
-    = ParameterList <<@ (COMMA ELLIPSIS)? #block >>
+    = << ParameterList (COMMA ELLIPSIS)? #block >>
     ;
 
 ParameterList
-    = ParameterDeclaration <<@ (COMMA ParameterDeclaration@) #param >>*
+    = ParameterDeclaration@ (COMMA ParameterDeclaration@)*
     ;
 
 ParameterDeclaration

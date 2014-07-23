@@ -282,11 +282,11 @@ template #while(x: bool, loop: void): void {
 }
 
 template #break(): void {
-	break
+	break;
 }
 
 template #continue(): void {
-	continue
+	continue;
 }
 
 template #throw(expr): void {
