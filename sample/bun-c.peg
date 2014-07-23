@@ -126,11 +126,26 @@ Declaration
     ;
 
 DeclarationNoAttribute
+    = ArrayDecl
+    / Decl
+    ;
+
+Decl
     = << DeclarationSpecifiers@1 
     ((Pointer? DirectDeclarator@0 (EQU Initializer@2)?)
     (COMMA
     (Pointer? DirectDeclarator@3 (EQU Initializer@4)?))*)? #var >>
     ;
+
+ArrayDecl
+    = << TArray@1 Pointer? Identifier@0 LBRK AssignmentExpression? RBRK (EQU Array@2)? #var >>
+    ;
+
+Array
+   = AssignmentExpression
+   / << LWING (Designation? Array@ (COMMA Designation? Array@)*)* COMMA? RWING #array >>
+   ;
+
 
 DeclarationSpecifiers
     = ( StorageClassSpecifier
@@ -179,6 +194,10 @@ TypeSpecifier
     / << COMPLEX   #Tcomplex  >>
     / << StructOrUnionSpecifier #Tstructorunion >>
     / << EnumSpecifier #Tenum >>
+    ;
+
+TArray
+    = << TypeSpecifier@ #TArray >>
     ;
 
 StructOrUnionSpecifier
@@ -261,11 +280,10 @@ DirectDeclarator
     = ( Identifier
       / LPAR Declarator@ RPAR
       )
-      ( << LBRK TypeQualifier@* AssignmentExpression@? RBRK #arraysize >>
+      ( LBRK TypeQualifier* AssignmentExpression? RBRK
       / LBRK STATIC TypeQualifier@* AssignmentExpression@ RBRK
       / LBRK TypeQualifier@+ STATIC AssignmentExpression@ RBRK
       / LBRK TypeQualifier@* STAR RBRK
-//      / LPAR ParameterTypeList@ RPAR
       / LPAR IdentifierList@? RPAR
       )*
     ;
@@ -414,7 +432,7 @@ PostfixExpression
     ;
 
 ArgumentExpressionList
-    = AssignmentExpression <<@ (COMMA AssignmentExpression@) #c.argumentexpressionlist >>*
+    = << AssignmentExpression@ (COMMA AssignmentExpression@)* #arguemts >>
     ;
 
 UnaryExpression
@@ -456,7 +474,7 @@ RelationalExpression
     ;
 
 EqualityExpression
-    = RelationalExpression <<@ (EQUEQU #equequ /BANGEQU #bangequ) RelationalExpression@ >>*
+    = RelationalExpression <<@ (EQ #eq / NOTEQU #noteq) RelationalExpression@ >>*
     ;
 
 ANDExpression
@@ -787,8 +805,8 @@ LT         =  "<"  ![=]   Spacing ;
 GT         =  ">"  ![=]   Spacing ;
 LE         =  "<="        Spacing ;
 GE         =  ">="        Spacing ;
-EQUEQU     =  "=="        Spacing ;
-BANGEQU    =  "!="        Spacing ;
+EQ         =  "=="        Spacing ;
+NOTEQU     =  "!="        Spacing ;
 HAT        =  "^"  ![=]   Spacing ;
 OR         =  "|"  ![=]   Spacing ;
 ANDAND     =  "&&"        Spacing ;

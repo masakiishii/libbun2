@@ -1,4 +1,3 @@
 void func(void) {
-	int a[10] = {};
-	a[2] = 3;
+	int a[3] = {0, 1, 2};
 }
