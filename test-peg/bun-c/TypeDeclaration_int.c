@@ -1,4 +1,4 @@
-int main(void) {
-	int a = 1;
+int f(int n) {
+	int a = n + 1;
 	return 0;
 }

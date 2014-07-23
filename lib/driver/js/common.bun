@@ -195,6 +195,22 @@ template #field(o: any, field) {
 	${o}->${textof field}
 }
 
+template #postinc(var) : void {
+        ${var}++;
+}
+
+template #postdec(var) : void {
+        ${var}--;
+}
+
+template #preinc(var) : void {
+        ++${var};
+}
+
+template #predec(var) : void {
+        --${var};
+}
+
 template #index(o: String, index: int): String {
 	${o}[${index}]
 }
@@ -208,7 +224,7 @@ template<T> #let(name, type: T, value: T): void {
 }
 
 template<T> #var(name, type: T, value: T): void {
-	${name} = ${value}
+	var ${name} = ${value};
 }
 
 template #name() {
@@ -261,7 +277,8 @@ template #if(x: bool, then: void, else: void): void {
 }
 
 template #while(x: bool, loop: void): void {
-	while ${x} { ${begin} ${statement loop} ${end} }
+	while ${x} { ${begin} ${statement loop} ${end}
+	}
 }
 
 template #break(): void {
