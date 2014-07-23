@@ -126,7 +126,10 @@ Declaration
     ;
 
 DeclarationNoAttribute
-    = DeclarationSpecifiers InitDeclaratorList?
+    = << DeclarationSpecifiers@1 
+    ((Pointer? DirectDeclarator@0 (EQU Initializer@2)?)
+    (COMMA
+    (Pointer? DirectDeclarator@3 (EQU Initializer@4)?))*)? #var >>
     ;
 
 DeclarationSpecifiers
@@ -149,12 +152,8 @@ DeclarationSpecifiers
       )+
     ;
 
-InitDeclaratorList
-    = InitDeclarator (COMMA InitDeclarator)*
-    ;
-
 InitDeclarator
-    = << Pointer? DirectDeclarator (EQU Initializer)? #assign >>
+    = Pointer? DirectDeclarator (EQU Initializer)?
     ;
 
 
@@ -163,7 +162,7 @@ StorageClassSpecifier
     / EXTERN
     / STATIC
     / AUTO
-    / REGISTER)@ #c.storageclassspecifier >>
+    / REGISTER) #c.storageclassspecifier >>
     ;
 
 TypeSpecifier
@@ -209,7 +208,7 @@ SpecifierQualifierList
     ;
 
 StructDeclaratorList
-    = << StructDeclarator@ (COMMA StructDeclarator@)* #c.structdeclaratorlist >>
+    = << StructDeclarator (COMMA StructDeclarator)* #c.structdeclaratorlist >>
     ;
 
 StructDeclarator
@@ -245,7 +244,7 @@ FunctionSpecifier
     ;
 
 Attribute
-    = << ATTRIBUTE #c.attribute LPAR LPAR (PostfixExpression@ / TypeQualifier@ / Identifier@) AttributeParamList@? RPAR RPAR >>;
+    = << ATTRIBUTE #c.attribute LPAR LPAR (PostfixExpression@ / TypeQualifier@ / Identifier@) AttributeParamList? RPAR RPAR >>;
 
 AttributeParam = << IntegerConstant@ / Identifier@ / StringLiteral@ #attributeparam >>;
 
@@ -263,16 +262,16 @@ DirectDeclarator
       / LPAR Declarator@ RPAR
       )
       ( << LBRK TypeQualifier@* AssignmentExpression@? RBRK #arraysize >>
-      / LBRK STATIC@ TypeQualifier@* AssignmentExpression@ RBRK
-      / LBRK TypeQualifier@+ STATIC@ AssignmentExpression@ RBRK
-      / LBRK TypeQualifier@* STAR@ RBRK
+      / LBRK STATIC TypeQualifier@* AssignmentExpression@ RBRK
+      / LBRK TypeQualifier@+ STATIC AssignmentExpression@ RBRK
+      / LBRK TypeQualifier@* STAR RBRK
 //      / LPAR ParameterTypeList@ RPAR
       / LPAR IdentifierList@? RPAR
       )*
     ;
 
 Pointer
-    = << ( STAR@ TypeQualifier@* )+ #c.pointer >>
+    = << ( STAR TypeQualifier@* )+ #c.pointer >>
     ;
 
 ParameterTypeList
@@ -374,9 +373,9 @@ IterationStatement
 
 JumpStatement
     = GOTO Identifier SEMI
-    / << CONTINUE@ SEMI #continue>>
-    / << BREAK@ SEMI #break >>
-    / << RETURN@ Expression@? SEMI #return >>
+    / << CONTINUE SEMI #continue>>
+    / << BREAK SEMI #break >>
+    / << RETURN Expression@? SEMI #return >>
     ;
 
 
@@ -392,12 +391,12 @@ PrimaryExpression
     ;
 
 Index
-    = LBRK@ Expression@ RBRK@
+    = LBRK Expression RBRK
     ;
 
 
 FunctionCall
-    = LPAR@ ArgumentExpressionList@? RPAR@
+    = LPAR ArgumentExpressionList@? RPAR
     ;
 
 PostfixExpression
@@ -410,7 +409,7 @@ PostfixExpression
       / DOT #field Identifier@
       / PTR #ptr Identifier@
       / INC #postinc
-      / DEC #dec
+      / DEC #postdec
       )@ >>*
     ;
 
@@ -420,10 +419,10 @@ ArgumentExpressionList
 
 UnaryExpression
     = PostfixExpression
-    / INC UnaryExpression
-    / DEC UnaryExpression
+    / << "++" UnaryExpression@ #preinc >>
+    / << "--" UnaryExpression@ #predec >>
     / UnaryOperator CastExpression
-    / << SIZEOF #c.sizeof (UnaryExpression@ / LPAR@ TypeName@ RPAR@ ) >>
+    / << SIZEOF #c.sizeof (UnaryExpression@ / LPAR TypeName@ RPAR ) >>
     ;
 
 UnaryOperator
@@ -485,7 +484,7 @@ ConditionalExpression
     ;
 
 AssignmentExpression
-    = << UnaryExpression AssignmentOperator AssignmentExpression #assign >>
+    = << UnaryExpression@ AssignmentOperator AssignmentExpression@ #assign >>
     / ConditionalExpression
     ;
 
@@ -500,7 +499,7 @@ AssignmentOperator
     / RIGHTEQU
     / ANDEQU
     / HATEQU
-    / OREQU)@ #c.assignmentoperator >>
+    / OREQU) #c.assignmentoperator >>
     ;
 
 Expression
@@ -632,7 +631,7 @@ Keyword
 //  distinct from keywords, but it seems so.
 //-------------------------------------------------------------------------
 
-Identifier = << !Keyword IdNondigit@ IdChar@* #name >> Spacing
+Identifier = << !Keyword IdNondigit IdChar* #name >> Spacing
            ;
 
 IdNondigit
@@ -733,7 +732,7 @@ FloatSuffix = [flFL] ;
 
 EnumerationConstant = Identifier ;
 
-CharacterConstant = << "L"? "'" Char@* "'" Spacing #characterconstant >>;
+CharacterConstant = << "L"? "'" Char* "'" Spacing #characterconstant >>;
 
 Char = Escape / !['\n\\] . ;
 
@@ -753,7 +752,7 @@ HexEscape    = "\\x" HexDigit+ ;
 //  A.1.6  String Literals
 //-------------------------------------------------------------------------
 
-StringLiteral = << "L"? (["] StringChar@* ["] Spacing)+ #string >>;
+StringLiteral = << "L"? (["] StringChar* ["] Spacing)+ #string >>;
 // FIXME we need to concatinate StringLiterals
 // e.g.) "a" "b" => "ab"
 

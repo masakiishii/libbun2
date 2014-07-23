@@ -1,7 +1,6 @@
-int main(void) {
+void f(int n) {
 	int i = 0;
-	while(i < 10) {
+	while(i < n) {
 		i++;
 	}
-	return 0;
 }
