@@ -268,7 +268,8 @@ template #block(): void {
 }
 
 template #if(x: bool, then: void): void {
-	if ${x} { ${begin} ${then} ${end} }
+	if ${x} { ${begin} ${then} ${end};
+	}
 }
 
 template #if(x: bool, then: void, else: void): void {
@@ -287,6 +288,10 @@ template #break(): void {
 
 template #continue(): void {
 	continue;
+}
+
+template #array(params) : void {
+	${list params ", "}
 }
 
 template #throw(expr): void {
