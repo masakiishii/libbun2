@@ -1,6 +1,8 @@
-int main(void) {
-	int n;
-	for(n = 0; n < 10 ; n++) {
+int f(int n) {
+	int i = 0;
+	int sum = 0;
+	for(i = 0; i < n; i++) {
+		sum = sum + i;
 	}
 	return 0;
 }
