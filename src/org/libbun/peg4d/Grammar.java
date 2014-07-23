@@ -9,6 +9,7 @@ public final class Grammar {
 	UMap<Peg>           pegMap;
 	UMap<String>        objectLabelMap = null;
 	public boolean      foundError = false;
+	int verifiedCount = 0;
 	
 	int statUnpredictableChoice = 0;
 	int statPredictableChoice = 0;
@@ -16,6 +17,11 @@ public final class Grammar {
 	public Grammar() {
 		this.pegMap = new UMap<Peg>();
 		this.pegMap.put("indent", new PegIndent(0));  // default rule
+	}
+
+	public final int count() {
+		this.verifiedCount += 1;
+		return this.verifiedCount;
 	}
 
 	public final boolean hasRule(String ruleName) {
@@ -73,7 +79,7 @@ public final class Grammar {
 			e.ruleName = ruleName;
 			e.verify2(e, this, ruleName, visited);
 			visited.clear();
-			if(Main.VerbosePeg) {
+			if(Main.VerbosePeg && !Main.VerboseStat) {
 				if(e.is(Peg.HasNewObject)) {
 					ruleName = "object " + ruleName; 
 				}
@@ -187,6 +193,7 @@ public final class Grammar {
 	public final boolean loadPegFile(String fileName) {
 		ParserContext p = Main.newParserContext(Main.loadSource(fileName));
 		p.setRuleSet(PegGrammar);
+		p.setRecognitionOnly(false);
 		while(p.hasNode()) {
 			p.initMemo();
 			PegObject node = p.parseNode("TopLevel");
@@ -561,11 +568,12 @@ public final class Grammar {
 			opt(n("_")), choice(n("Rule"), n("Import")), opt(n("_")), s(";"), opt(n("_"))
 		));
 		this.check();
-		this.show("TopLevel");
+		//this.show("TopLevel");
 		return this;
 	}
 	
 	public final static Grammar PegGrammar = new Grammar().loadPegGrammar();
+
 
 }
 

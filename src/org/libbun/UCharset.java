@@ -201,7 +201,7 @@ public class UCharset {
 			return Long.parseLong(Text);
 		}
 		catch(NumberFormatException e) {
-			//ZLogger.VerboseException(e);
+			e.printStackTrace();
 		}
 		return 0L;
 	}

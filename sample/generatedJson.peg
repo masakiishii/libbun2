@@ -1,0 +1,170 @@
+
+TopLevel 
+		= << WS Array@ WS #toplevel >>;
+			
+BeginArray
+		= WS '[' WS;
+			
+BeginObject
+		= WS '{' WS;
+			
+EndArray
+		= WS ']' WS;
+			
+EndObject
+		= WS '}' WS;
+			
+NameSeparator
+		= WS ':' WS;
+			
+ValueSeparator
+		= WS ',' WS;
+			
+WS			
+		= [ \t\n\r]*;
+						
+False
+		= << "false" #false >>;
+			
+Null
+		= << "null" #null >>;
+			
+True
+		= << "true" #true >>;
+				
+Array
+		= BeginArray << ( Object0@ ( ValueSeparator Object0@ )* )? #array >> EndArray;
+		
+Number
+		= << Minus? Int Frac? Exp? #number >>;
+		
+DecimalPoint
+		= '.';
+		
+Digit1_9
+		= [1-9];
+		
+E
+		= [eE];
+		
+Exp
+		= E ( Minus / Plus )? DIGIT+;
+		
+Frac
+		= DecimalPoint DIGIT+;
+		
+Int
+		= Zero / (Digit1_9 DIGIT*);
+		
+Minus
+		= '-';
+		
+Plus
+		= '+';
+		
+Zero
+		= '0';
+		
+String
+		= QuotationMark << Char* #string >> QuotationMark;
+		
+Char
+		= Unescaped
+		/ Escape
+		(
+					'"'
+				/	"\\"
+				/	'/'
+				/	'b'
+				/	'f'
+				/	'n'
+				/	'r'
+				/	't'
+				/	'u' (HEXDIG HEXDIG HEXDIG HEXDIG)
+		);
+		
+Escape
+		= "\\";
+		
+QuotationMark
+		= '"';
+		
+Unescaped
+		= [\u0020-\u0021]/[\u0023-\u005B]/[\u005D-\uFFFF];
+		
+DIGIT		
+		= [0-9];
+		
+HEXDIG
+		= [0-9a-fA-F];
+
+Object1 = << BeginObject Value1@ EndObject #object>>;
+
+Name1 = << "Friend" #string >>;
+
+Member1_0 = << Key1_0@ NameSeparator String@ #member >>;
+
+Key1_0 = << QuotationMark "Name" QuotationMark #key >>;
+
+Value1 = Member1_0@;
+
+Object2 = << BeginObject Value2@ EndObject #object>>;
+
+Name2 = << "Friends" #string >>;
+
+Member2_0 = <<Key2_0@ NameSeparator Array2_0@ #member >>;
+
+Array2_0 = BeginArray << Object1@ ( ValueSeparator Object1@)* #array >> EndArray;
+
+Key2_0 = << QuotationMark "Friends" QuotationMark #key >>;
+
+Value2 = Member2_0@;
+
+Object3 = << BeginObject Value3@ EndObject #object>>;
+
+Name3 = << "School" #string >>;
+
+Member3_0 = << Key3_0@ NameSeparator String@ #member >>;
+
+Key3_0 = << QuotationMark "SchoolName" QuotationMark #key >>;
+
+Member3_1 = << Key3_1@ NameSeparator Number@ #member >>;
+
+Key3_1 = << QuotationMark "Grade" QuotationMark #key >>;
+
+Member3_2 = << Key3_2@ NameSeparator Number@ #member >>;
+
+Key3_2 = << QuotationMark "ID" QuotationMark #key >>;
+
+Value3 = Member3_0@ ValueSeparator Member3_1@ ValueSeparator Member3_2@;
+
+Object0 = BeginObject << Member0@ ( ValueSeparator Member0@ )  #object >> EndObject;
+
+Member0 = << Object0_0@ #member>>;
+
+Object0_0 = << QuotationMark Name0@ QuotationMark NameSeparator BeginObject Value0@ EndObject #object >>;
+
+Name0 = << "Human" #string >>;
+
+Member0_0 = << Key0_0@ NameSeparator String@ #member >>;
+
+Key0_0 = << QuotationMark "Name" QuotationMark #key >>;
+
+Member0_1 = << Key0_1@ NameSeparator Number@ #member >>;
+
+Key0_1 = << QuotationMark "Age" QuotationMark #key >>;
+
+Member0_2 = << Key0_2@ NameSeparator (True@ / False@) #member >>;
+
+Key0_2 = << QuotationMark "SingleLife" QuotationMark #key >>;
+
+Member0_3 = <<Key0_3@ NameSeparator Object3@ #member >>;
+
+Key0_3 = << QuotationMark "School" QuotationMark #key >>;
+
+Member0_4 = <<Key0_4@ NameSeparator Object2@ #member >>;
+
+Key0_4 = << QuotationMark "Friends" QuotationMark #key >>;
+
+Value0 = Member0_0@ ValueSeparator Member0_1@ ValueSeparator Member0_2@ ValueSeparator Member0_3@ ValueSeparator Member0_4@;
+

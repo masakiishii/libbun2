@@ -18,7 +18,7 @@ public class FileSource extends ParserSource {
 	private byte[] buffer;
 	
 	private StringSource debug = null;
-	private final int FifoSize = 12; 
+	private final int FifoSize = 8; 
 	private LinkedHashMap<Long, byte[]> fifoMap = null;
 	
 	public FileSource(String fileName) throws FileNotFoundException {
@@ -60,19 +60,19 @@ public class FileSource extends ParserSource {
 		return (pos / PageSize) * PageSize;
 	}
 
-	public final char charAt_(long n) {
-		long buffer_pos = (n - this.buffer_offset);
+	public final char charAt(long n) {
+		int buffer_pos = (int)(n - this.buffer_offset);
 		if(!(buffer_pos >= 0 && buffer_pos < PageSize)) {
 			this.buffer_offset = buffer_alignment(n);
 			this.readMainBuffer(this.buffer_offset);
-			buffer_pos = (n - this.buffer_offset);
+			buffer_pos = (int)(n - this.buffer_offset);
 		}
-		return (char)this.buffer[(int)buffer_pos];
+		return (char)this.buffer[buffer_pos];
 	}
 	
-	public final char charAt(long n) {
+	public final char charAtDebug(long n) {
 		//assert(n < this.fileLength);
-		char c = this.charAt_(n);
+		char c = this.charAt(n);
 		if(this.debug != null) {
 			char c2 = this.debug.charAt(n);
 			if(c != c2) {
@@ -82,8 +82,7 @@ public class FileSource extends ParserSource {
 		return c;
 	}
 	
-	
-	public final String substring_(long startIndex, long endIndex) {
+	public final String substring(long startIndex, long endIndex) {
 		if(endIndex > startIndex) {
 			try {
 				long off_s = buffer_alignment(startIndex);
@@ -107,8 +106,8 @@ public class FileSource extends ParserSource {
 		return "";
 	}
 
-	public final String substring(long startIndex, long endIndex) {
-		String s= this.substring_(startIndex, endIndex);
+	public final String substringDebug(long startIndex, long endIndex) {
+		String s= this.substring(startIndex, endIndex);
 		if(this.debug != null) {
 			String s2= this.debug.substring(startIndex, endIndex);
 			if(!s.equals(s2)) {

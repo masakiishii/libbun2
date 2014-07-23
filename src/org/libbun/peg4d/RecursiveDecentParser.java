@@ -29,17 +29,21 @@ public class RecursiveDecentParser extends ParserContext {
 		this.initMemo();
 	}
 	
+	public void initMemo() {
+		this.memoMap = new NoMemo();
+	}
+	
 	public ParserContext newParserContext(ParserSource source, long startIndex, long endIndex) {
 		return new RecursiveDecentParser(source, startIndex, endIndex, this.pegList);
 	}
 	
 	@Override
 	public void setRuleSet(Grammar ruleSet) {
-		this.ruleSet = ruleSet;
+		this.rules = ruleSet;
 		this.pegCache = new UMap<Peg>();
-		this.pegList = new UList<Peg>(new Peg[this.ruleSet.pegMap.size()]);
+		this.pegList = new UList<Peg>(new Peg[this.rules.pegMap.size()]);
 		UList<String> list = ruleSet.pegMap.keys();
-		PegOptimizer optimizer = new PegOptimizer(this.ruleSet, this.pegCache);
+		PegOptimizer optimizer = new PegOptimizer(this.rules, this.pegCache);
 		for(int i = 0; i < list.size(); i++) {
 			String key = list.ArrayValues[i];
 			Peg e = ruleSet.pegMap.get(key, null);
@@ -54,89 +58,9 @@ public class RecursiveDecentParser extends ParserContext {
 		this.statOptimizedPeg = optimizer.statOptimizedPeg;
 	}
 
-
-	
-//	private void appendPegCache(String name, Peg e) {
-//		Peg defined = this.pegCache.get(name, null);
-//		if(defined != null) {
-//			e = defined.appendAsChoice(e);
-//		}
-//		this.pegCache.put(name, e);
-//	}
-
 	public final Peg getRule(String name) {
 		return this.pegCache.get(name, null);
 	}
 
-//	private final Peg getRightJoinRule(String name) {
-//		return this.pegCache.get(this.nameRightJoinName(name), null);
-//	}
-		
-	protected final static int FifoSize = 64;
-
-	public final class ObjectMemo {
-		ObjectMemo next;
-		Peg  keypeg;
-		PegObject generated;
-		int  consumed;
-	}
-
-	protected Map<Long, ObjectMemo> memoMap;
-	private ObjectMemo UnusedMemo = null;
-
-	public void initMemo() {
-	}
-
-	private final ObjectMemo newMemo() {
-		if(UnusedMemo != null) {
-			ObjectMemo m = this.UnusedMemo;
-			this.UnusedMemo = m.next;
-			return m;
-		}
-		else {
-			ObjectMemo m = new ObjectMemo();
-			this.memoSize += 1;
-			return m;
-		}
-	}
-	
-	protected final void setMemo(long keypos, Peg keypeg, PegObject generated, int consumed) {
-		ObjectMemo m = null;
-		m = newMemo();
-		m.keypeg = keypeg;
-		m.generated = generated;
-		m.consumed = consumed;
-		m.next = this.memoMap.get(keypos);
-		this.memoMap.put(keypos, m);
-//		if(keypeg == peg) {
-//			System.out.println("cache " + keypos + ", " + keypeg);
-//		}
-	}
-
-	protected final ObjectMemo getMemo(Peg keypeg, long keypos) {
-		ObjectMemo m = this.memoMap.get(keypos);
-		while(m != null) {
-			if(m.keypeg == keypeg) {
-				this.memoHit += 1;
-				return m;
-			}
-			m = m.next;
-		}
-		this.memoMiss += 1;
-		return m;
-	}
-	
-	protected final void unusedMemo(ObjectMemo m) {
-		this.appendMemo2(m, UnusedMemo);
-		UnusedMemo = m;
-	}
-	
-	private void appendMemo2(ObjectMemo m, ObjectMemo n) {
-		while(m.next != null) {
-			m = m.next;
-		}
-		m.next = n;
-	}			
-	
 }
 

@@ -1,0 +1,47 @@
+
+TopLevel
+ = << Skip ('{{' (Data@ '}}' / .) Skip)* #array `` >>
+ ;
+
+Skip
+ = (!'{{' .)*
+ ;
+
+Data
+ = << (!'=' !'}}'.)* '=' (!'}}' .)* #string>> |> DataImpl
+ ;
+
+DataImpl
+ = Data2 / << #error `broken data` >>
+ ;
+
+Data2
+ = << Category@ ('|' KeyValue@)+ #object >> 
+ ;
+
+CategoryValue
+ = << (![|\r\n] !'{{' !'}}'.)* #text>> '\r'? '\n'?
+ ;
+CategoryKey
+ = << '' #text `Category` >>
+ ;
+Category
+ = << CategoryKey@ CategoryValue@ #keyvalue >>
+ ;
+
+KeyValue
+ = << #keyvalue Key@ '=' [ \t]* Value@ >>
+ ;
+Key
+ = << (!'=' !'{{' !'}}' !'|' .)* #text>> 
+ ;
+Value
+ = Text <<@ (Markup@ Text@)+ #strings >>? 
+ ;
+Text
+ = << (![|\r\n] !'[[' !'}}' .)* #text >> '\r'? '\n'?
+ ;
+Markup
+ = '[[' << (!']]' .)* #text >> ']]' 
+ ;
+

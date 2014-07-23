@@ -33,17 +33,24 @@ public abstract class Peg {
 	                             | HasPipe | HasCatch | HasContext;
 	
 	public final static int Debug             = 1 << 24;
-
+	private static int PegIdCount = 0;
 	
-	int       flag     = 0;
-	String    ruleName = null;
+	int        flag     = 0;
+	int        pegid2   = 0;
+	String     ruleName = null;
 
 	ParserSource source = null;
 	int       sourcePosition = 0;
 	
+	protected Peg(int flag) {
+		this.flag = flag;
+		PegIdCount += 1;
+		this.pegid2 = PegIdCount;
+	}
+	
 	protected abstract Peg clone(PegTransformer tr);
 	protected abstract void stringfy(UStringBuilder sb, PegFormatter fmt);
-	protected abstract boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set);
+	protected abstract void makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set);
 	protected abstract void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited);
 	public abstract PegObject simpleMatch(PegObject left, ParserContext context);
 	
@@ -82,10 +89,10 @@ public abstract class Peg {
 		this.flag = this.flag | uflag;
 	}
 
-	public final void derived(Peg e) {
+	protected final void derived(Peg e) {
 		this.flag |= (e.flag & Peg.Mask);
 	}
-		
+	
 	public int size() {
 		return 0;
 	}
@@ -132,16 +139,18 @@ public abstract class Peg {
 	}
 
 	protected final void report(String type, String msg) {
-		if(this.source != null) {
-			System.out.println(this.source.formatErrorMessage(type, this.sourcePosition-1, msg));
-		}
-		else {
-			System.out.println(type + ": " + msg + "\n\t" + this);
+		if(!Main.VerboseStat) {
+			if(this.source != null) {
+				System.out.println(this.source.formatErrorMessage(type, this.sourcePosition-1, msg));
+			}
+			else {
+				System.out.println(type + ": " + msg + "\n\t" + this);
+			}
 		}
 	}
 	
 	protected void warning(String msg) {
-		if(Main.VerbosePeg) {
+		if(Main.VerbosePeg && !Main.VerboseStat) {
 			Main._PrintLine("PEG warning: " + msg);
 		}
 	}
@@ -194,38 +203,41 @@ public abstract class Peg {
 		}
 	}
 
-	// statistics 
-	class CallCounter {
-		String ruleName;
-		int total = 0;
-		int repeated = 0;
-	}
-	private HashMap<Long, CallCounter> countMap;
-	private CallCounter statCallCounter;
-	public final void countCall(ParserContext p, String name, long pos) {
-		Long key = pos;
-		if(this.countMap == null) {
-			this.countMap = new HashMap<>();
-			this.statCallCounter = new CallCounter();
-			this.statCallCounter.ruleName = name;
-			p.setCallCounter(this.statCallCounter);
-		}
-		this.statCallCounter.total += 1;
-		CallCounter c = this.countMap.get(key);
-		if(c == null) {
-			this.countMap.put(key, this.statCallCounter);
-		}
-		else {
-			c.repeated += 1;
-		}
-	}
-	public final boolean isRepeatedCall(long pos) {
-		if(this.countMap != null) {
-			CallCounter c = this.countMap.get(pos);
-			return c != null;
-		}
-		return false;
-	}
+	int statCallCount = 0;
+	int statRepeatCount = 0;
+
+//	// statistics 
+//	class CallCounter {
+//		String ruleName;
+//		int total = 0;
+//		int repeated = 0;
+//	}
+//	private HashMap<Long, CallCounter> countMap;
+//	private CallCounter statCallCounter;
+//	public final void countCall(ParserContext p, String name, long pos) {
+//		Long key = pos;
+//		if(this.countMap == null) {
+//			this.countMap = new HashMap<>();
+//			this.statCallCounter = new CallCounter();
+//			this.statCallCounter.ruleName = name;
+//			p.setCallCounter(this.statCallCounter);
+//		}
+//		this.statCallCounter.total += 1;
+//		CallCounter c = this.countMap.get(key);
+//		if(c == null) {
+//			this.countMap.put(key, this.statCallCounter);
+//		}
+//		else {
+//			c.repeated += 1;
+//		}
+//	}
+//	public final boolean isRepeatedCall(long pos) {
+//		if(this.countMap != null) {
+//			CallCounter c = this.countMap.get(pos);
+//			return c != null;
+//		}
+//		return false;
+//	}
 	
 }
 
@@ -242,12 +254,10 @@ class PegNoTransformer extends PegTransformer {
 
 abstract class PegTerm extends Peg {
 	public PegTerm (int flag) {
-		super();
-		this.flag = flag;
+		super(flag);
 	}
 	@Override
-	protected boolean makeList(String startRule, Grammar rules, UList<String> list, UMap<String> set) {
-		return false;
+	protected void makeList(String startRule, Grammar rules, UList<String> list, UMap<String> set) {
 	}
 	@Override
 	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
@@ -289,7 +299,7 @@ class PegNonTerminal extends PegTerm {
 	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
 		Peg next = rules.getRule(this.symbol);
-		if( next == null ) {
+		if( next == null && !Main.VerboseStat) {
 			Main._PrintLine(this.source.formatErrorMessage("error", this.sourcePosition, "undefined label: " + this.symbol));
 			rules.foundError = true;
 			return;
@@ -313,22 +323,13 @@ class PegNonTerminal extends PegTerm {
 		return context.matchNonTerminal(left, this);
 	}
 	@Override
-	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
-		boolean cyclic = false;
-		if(startRule.equals(this.symbol)) {
-			cyclic = true;
-		}
+	protected void makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 		if(!set.hasKey(this.symbol)) {
 			Peg next = parser.getRule(this.symbol);
-			if(next != null) {   // listRule is called before verification
-				list.add(this.symbol);
-				set.put(this.symbol, this.symbol);
-				if(next.makeList(startRule, parser, list, set)) {
-					cyclic = true;
-				}
-			}
+			list.add(this.symbol);
+			set.put(this.symbol, this.symbol);
+			next.makeList(startRule, parser, list, set);
 		}
-		return cyclic;
 	}
 }
 
@@ -447,9 +448,8 @@ class PegCharacter extends PegTerm {
 abstract class PegUnary extends Peg {
 	Peg inner;
 	public PegUnary(int flag, Peg e) {
-		super();
+		super(flag);
 		this.inner = e;
-		this.flag = flag;
 		this.derived(e);
 	}
 	@Override
@@ -461,8 +461,8 @@ abstract class PegUnary extends Peg {
 		return this.inner;
 	}
 	@Override
-	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
-		return this.inner.makeList(startRule, parser, list, set);
+	protected void makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
+		this.inner.makeList(startRule, parser, list, set);
 	}
 	@Override
 	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
@@ -620,9 +620,8 @@ class PegNot extends PegUnary {
 abstract class PegList extends Peg {
 	protected UList<Peg> list;
 	PegList(int flag) {
-		super();
+		super(flag);
 		this.list = new UList<Peg>(new Peg[2]);
-		this.flag = flag;
 	}
 	public final int size() {
 		return this.list.size();
@@ -645,14 +644,10 @@ abstract class PegList extends Peg {
 		this.list.ArrayValues[j] = e;
 	}
 	@Override
-	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
-		boolean cyclic = false;
+	protected void makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 		for(int i = 0; i < this.size(); i++) {
-			if(this.get(i).makeList(startRule, parser, list, set)) {
-				cyclic = true;
-			}
+			this.get(i).makeList(startRule, parser, list, set);
 		}
-		return cyclic;
 	}
 	@Override
 	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
@@ -902,7 +897,6 @@ class PegMessage extends PegTerm {
 	@Override
 	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
 		super.verify2(startRule, rules, visitingName, visited);
-		this.set(Peg.HasMessage);
 		startRule.derived(this);
 	}
 }
@@ -923,6 +917,7 @@ class PegNewObject extends PegList {
 		Peg ne = tr.transform(this);
 		if(ne == null) {
 			PegList l = new PegNewObject(this.flag, this.leftJoin);
+			l.ruleName = this.ruleName;
 			for(int i = 0; i < this.list.size(); i++) {
 				l.list.add(this.get(i).clone(tr));
 			}
@@ -1046,77 +1041,13 @@ class PegIndex extends PegTerm {
 	}
 }
 
-//// (e / catch e)
-//
-//class PegPipe extends PegNonTerminal {
-//	public PegPipe(String ruleName) {
-//		super(ruleName);
-//	}
-//	@Override
-//	protected Peg clone(PegTransformer tr) {
-//		Peg ne = tr.transform(this);
-//		if(ne == null) {
-//			ne = new PegPipe(this.symbol);
-//			ne.flag = this.flag;
-//		}
-//		return ne;
-//	}
-//	@Override
-//	protected final void stringfy(UStringBuilder sb, PegFormatter fmt) {
-//		if(fmt) {
-//			sb.append("|> ");
-//			sb.append(this.symbol);
-//		}
-//	}
-//	@Override
-//	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
-//		super.verify2(startRule, rules, visitingName, visited);
-//		this.set(Peg.HasPipe);
-//		startRule.derived(this);
-//	}
-//
-//	@Override
-//	public PegObject simpleMatch(PegObject left, ParserContext context) {
-//		return context.matchPipe(left, this);
-//	}
-//}
-//
-//class PegCatch extends PegUnary {
-//	PegCatch (String ruleName, Peg first) {
-//		super(0, first, true);
-//	}
-//	@Override
-//	protected Peg clone(PegTransformer tr) {
-//		Peg e = this.inner.clone(tr);
-//		if(e != this) {
-//			return new PegCatch(this.ruleName, e);
-//		}
-//		return this;
-//	}
-//	@Override
-//	protected String getOperator() {
-//		return "catch ";
-//	}
-//	@Override
-//	public PegObject simpleMatch(PegObject left, ParserContext context) {
-//		return context.matchCatch(left, this);
-//	}
-//	@Override
-//	protected void verify2(Peg startRule, Grammar rules, String visitingName, UMap<String> visited) {
-//		super.verify2(startRule, rules, visitingName, visited);
-//		this.set(Peg.HasCatch);
-//		startRule.derived(this);
-//	}
-//
-//}
 
 abstract class PegOptimized extends Peg {
 	Peg orig;
 	PegOptimized (Peg orig) {
-		super();
+		super(orig.flag);
 		this.orig = orig;
 		this.ruleName = orig.ruleName;
-		this.flag = orig.flag;
 	}
 	@Override
 	protected Peg clone(PegTransformer tr) {
@@ -1132,8 +1063,7 @@ abstract class PegOptimized extends Peg {
 		this.derived(this.orig);
 	}
 	@Override
-	protected boolean makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
-		return false;
+	protected void makeList(String startRule, Grammar parser, UList<String> list, UMap<String> set) {
 	}
 
 }

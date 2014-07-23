@@ -1,0 +1,14 @@
+
+// This is a simple example of csv file
+// NOTE: not comformed to any standard
+// 
+
+TopLevel =  << Line@*              #array >>;
+
+Line     =  << Value@ (',' Value@)* ('\r'? '\n' / EOT) #array >>;
+Value    
+  =  '"' << (!'"' .)* #text >> '"' 
+  / << [0-9]+ ('.' [0-9]+ #float / '' #int) >>
+  / << (![,\r\n] .)*    #text >>
+  ;
+EOT      =  !.;

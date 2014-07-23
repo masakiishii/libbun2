@@ -1,22 +1,21 @@
 package org.libbun.peg4d;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.libbun.Functor;
 import org.libbun.Main;
 import org.libbun.UCharset;
 import org.libbun.UList;
-import org.libbun.peg4d.Peg.CallCounter;
 
 public abstract class ParserContext {
 	public final          ParserSource source;
 	protected long        sourcePosition = 0;
 	public    long        endPosition;
-	public    Grammar ruleSet = null;
+	public    Grammar     rules = null;
 	
 	long statBacktrackCount = 0;
 	long statBacktrackSize = 0;
@@ -150,22 +149,47 @@ public abstract class ParserContext {
 		PegObject o = start.simpleMatch(new PegObject("#toplevel"), this);
 		if(o.isFailure()) {
 			o = this.newErrorObject();
+			o.optionalToken = this.source.formatErrorMessage("syntax error", o.startIndex, "");
+			System.out.println(o.optionalToken);
 		}
 		return o;
 	}
 	
-	public final PegObject newPegObject(String name) {
-		PegObject node = new PegObject(name, this.source, null, this.sourcePosition);
-		this.statObjectCount = this.statObjectCount + 1;
-		return node;
+	protected Memo memoMap = null;
+	public abstract void initMemo();
+	
+	
+	protected PegObject successResult = null;
+	
+	public final void setRecognitionOnly(boolean checkMode) {
+		if(checkMode) {
+			this.successResult = new PegObject("#success", this.source, null, 0);
+		}
+		else {
+			this.successResult = null;
+		}
+	}
+	
+	public final boolean isRecognitionOnly() {
+		return this.successResult != null;
+	}
+	
+	public final PegObject newPegObject(String name, Peg created, long pos) {
+		if(this.isRecognitionOnly()) {
+			this.successResult.startIndex = pos;
+			return this.successResult;
+		}
+		else {
+			this.statObjectCount = this.statObjectCount + 1;
+			PegObject node = new PegObject(name, this.source, created, pos);
+			return node;
+		}
 	}
 	
 	protected final PegObject foundFailureNode = new PegObject(null, this.source, null, 0);
 
 	public final PegObject newErrorObject() {
-		PegObject node = newPegObject("#error");
-		node.createdPeg = this.foundFailureNode.createdPeg;
-		node.startIndex = this.foundFailureNode.startIndex;
+		PegObject node = newPegObject("#error", this.foundFailureNode.createdPeg, this.foundFailureNode.startIndex);
 		node.matched = Functor.ErrorFunctor;
 		return node;
 	}
@@ -188,9 +212,9 @@ public abstract class ParserContext {
 
 	public PegObject matchNonTerminal(PegObject left, PegNonTerminal e) {
 		Peg next = this.getRule(e.symbol);
-		if(Main.VerboseStatCall) {
-			next.countCall(this, e.symbol, this.getPosition());
-		}
+//		if(Main.VerboseStatCall) {
+//			next.countCall(this, e.symbol, this.getPosition());
+//		}
 		return next.performMatch(left, this);
 	}
 
@@ -366,59 +390,66 @@ public abstract class ParserContext {
 	}
 	
 	protected final void pushSetter(PegObject parentNode, int index, PegObject childNode) {
-		ObjectLog l = this.newLog();
-		l.parentNode = parentNode;
-		l.childNode  = childNode;
-		l.index = index;
-		l.id = this.logStack.id + 1;
-		l.next = this.logStack;
-		this.logStack = l;
-		//System.out.println("push " + l.id + ", index= " + index);
+		if(!this.isRecognitionOnly()) {
+			ObjectLog l = this.newLog();
+			l.parentNode = parentNode;
+			l.childNode  = childNode;
+			l.index = index;
+			l.id = this.logStack.id + 1;
+			l.next = this.logStack;
+			this.logStack = l;
+			//System.out.println("push " + l.id + ", index= " + index);
+		}
 	}
 
 	protected final void popNewObject(PegObject newnode, long startIndex, int marker) {
-		ObjectLog cur = this.logStack;
-		if(cur.id > marker) {
-			UList<ObjectLog> entryList = new UList<ObjectLog>(new ObjectLog[8]);
-			ObjectLog unused = this.logStack;
-			while(cur != null) {
-				//System.out.println("object cur.id="+cur.id + ", marker="+marker);
-				if(cur.parentNode == newnode) {
-					entryList.add(cur);
-				}
-				if(cur.id == marker + 1) {
-					this.logStack = cur.next; 
-					cur.next = this.unusedLog;
-					this.unusedLog = unused;
-					break;
-				}
-				cur = cur.next;
-			}
-			if(entryList.size() > 0) {
-				newnode.expandAstToSize(entryList.size());
-				int index = 0;
-				for(int i = entryList.size() - 1; i >= 0; i--) {
-					ObjectLog l = entryList.ArrayValues[i];
-					if(l.index == -1) {
-						l.index = index;
+		if(!this.isRecognitionOnly()) {
+			ObjectLog cur = this.logStack;
+			if(cur.id > marker) {
+				UList<ObjectLog> entryList = new UList<ObjectLog>(new ObjectLog[8]);
+				ObjectLog unused = this.logStack;
+				while(cur != null) {
+					//System.out.println("object cur.id="+cur.id + ", marker="+marker);
+					if(cur.parentNode == newnode) {
+						entryList.add(cur);
 					}
-					index += 1;
+					if(cur.id == marker + 1) {
+						this.logStack = cur.next; 
+						cur.next = this.unusedLog;
+						this.unusedLog = unused;
+						break;
+					}
+					cur = cur.next;
 				}
-				for(int i = entryList.size() - 1; i >= 0; i--) {
-					ObjectLog l = entryList.ArrayValues[i];
-					newnode.set(l.index, l.childNode);
-					l.childNode = null;
+				if(entryList.size() > 0) {
+					newnode.expandAstToSize(entryList.size());
+					int index = 0;
+					for(int i = entryList.size() - 1; i >= 0; i--) {
+						ObjectLog l = entryList.ArrayValues[i];
+						if(l.index == -1) {
+							l.index = index;
+						}
+						index += 1;
+					}
+					for(int i = entryList.size() - 1; i >= 0; i--) {
+						ObjectLog l = entryList.ArrayValues[i];
+						newnode.set(l.index, l.childNode);
+						l.childNode = null;
+					}
+					newnode.checkNullEntry();
 				}
-				newnode.checkNullEntry();
+				entryList = null;
 			}
-			entryList = null;
+			newnode.setSource(startIndex, this.getPosition());
 		}
-		newnode.setSource(startIndex, this.getPosition());
 	}
 	
 	public PegObject matchNewObject(PegObject left, PegNewObject e) {
 		PegObject leftNode = left;
 		long startIndex = this.getPosition();
+		if(Main.VerboseStatCall) {
+			this.count(e, startIndex);
+		}
 		if(e.predictionIndex > 0) {
 			for(int i = 0; i < e.predictionIndex; i++) {
 				PegObject node = e.get(i).performMatch(left, this);
@@ -430,8 +461,7 @@ public abstract class ParserContext {
 			}
 		}
 		int markerId = this.pushNewMarker();
-		PegObject newnode = this.newPegObject(e.nodeName);
-		newnode.setSource(e, this.source, startIndex);
+		PegObject newnode = this.newPegObject(e.nodeName, e, startIndex);
 		if(e.leftJoin) {
 			this.pushSetter(newnode, -1, leftNode);
 		}
@@ -479,11 +509,17 @@ public abstract class ParserContext {
 	}
 
 	public PegObject matchSetter(PegObject left, PegSetter e) {
+		long pos = left.startIndex;
 		PegObject node = e.inner.performMatch(left, this);
 		if(node.isFailure() || left == node) {
 			return node;
 		}
-		this.pushSetter(left, e.index, node);
+		if(this.isRecognitionOnly()) {
+			left.startIndex = pos;
+		}
+		else {
+			this.pushSetter(left, e.index, node);
+		}
 		return left;
 	}
 
@@ -522,38 +558,64 @@ public abstract class ParserContext {
 //		return left;
 //	}
 
-	public void initMemo() {
-		// TODO Auto-generated method stub
-		
+
+
+	
+	
+//	protected final long getpos(long keypos) {
+//		return this.getpos1(keypos);
+//	}
+//
+//	protected final void setMemo(long keypos, Peg keypeg, PegObject generated, int consumed) {
+//		this.setMemo1(keypos, keypeg, generated, consumed);
+//	}
+//
+//	protected final ObjectMemo getMemo(Peg keypeg, long keypos) {
+//		return this.getMemo1(keypeg, keypos);
+//	}
+//	
+	Map<Long, Peg> countMap = null;
+	private UList<Peg> statCalledPegList = null;
+
+	private int statCallCount = 0;
+	private int statRepeatCount = 0;
+	
+	private void checkCountMap() {
+		if(this.countMap == null) {
+			this.statCallCount = 0;
+			this.statRepeatCount = 0;
+			this.countMap = new HashMap<Long, Peg>();
+			this.statCalledPegList = new UList<Peg>(new Peg[256]);
+		}
 	}
 	
-	protected int memoHit = 0;
-	protected int memoMiss = 0;
-	protected int memoSize = 0;
-
+	protected final void count(Peg e, long pos) {
+		e.statCallCount += 1;
+		statCallCount += 1;
+		if(Main.VerboseStatCall) {
+			checkCountMap();
+			Long key = Memo.makekey(pos, e);
+			Peg p = this.countMap.get(key);
+			if(p != null) {
+				assert(p == e);
+				p.statRepeatCount += 1;
+				statRepeatCount += 1;
+			}
+			else {
+				this.countMap.put(key, e);
+			}
+			if(e.statCallCount == 1) {
+				this.statCalledPegList.add(e);
+			}
+		}
+	}
+	
+	
 	long statErapsedTime = 0;
 	long usedMemory;
 	int statOptimizedPeg = 0;
 	
-	private UList<CallCounter> statCallCounterList = null;
-
-	void setCallCounter(CallCounter c) {
-		if(this.statCallCounterList == null) {
-			this.statCallCounterList = new UList<CallCounter>(new CallCounter[100]);
-		}
-		this.statCallCounterList.add(c);
-	}
 		
-	public void beginStatInfo() {
-		System.gc(); // meaningless ?
-		this.statBacktrackSize = 0;
-		this.statBacktrackCount = 0;
-		long total = Runtime.getRuntime().totalMemory() / 1024;
-		long free =  Runtime.getRuntime().freeMemory() / 1024;
-		usedMemory =  total - free;
-		statErapsedTime = System.currentTimeMillis();
-	}
-
 	private String ratio(double num) {
 		return String.format("%.3f", num);
 	}
@@ -603,7 +665,16 @@ public abstract class ParserContext {
 
 
 	
-	
+	public void beginStatInfo() {
+		System.gc(); // meaningless ?
+		this.statBacktrackSize = 0;
+		this.statBacktrackCount = 0;
+		long total = Runtime.getRuntime().totalMemory();
+		long free =  Runtime.getRuntime().freeMemory();
+		usedMemory =  total - free;
+		statErapsedTime = System.currentTimeMillis();
+	}
+
 	public void endStatInfo(PegObject parsedObject) {
 		statErapsedTime = (System.currentTimeMillis() - statErapsedTime);
 		System.gc(); // meaningless ?
@@ -619,42 +690,39 @@ public abstract class ParserContext {
 			long statFileLength = this.source.getFileLength();
 			long statReadLength = this.source.statReadLength;
 			double fileKps = (statFileLength) / (statErapsedTime / 1000.0);
-			System.out.println("parser: " + this.getClass().getSimpleName() + " -O" + Main.OptimizedLevel + " optimized peg: " + this.statOptimizedPeg );
+			System.out.println("parser: " + this.getClass().getSimpleName() + " -O" + Main.OptimizedLevel + " -Xw" + Main.MemoFactor + " optimized peg: " + this.statOptimizedPeg );
 			System.out.println("file: " + this.source.fileName + " filesize: " + KMunit(statFileLength, "Kb", "Mb"));
 			System.out.println("IO: " + this.source.statIOCount +" read/file: " + ratio((double)statReadLength/statFileLength) + " pagesize: " + Nunit(FileSource.PageSize, "bytes") + " read: " + KMunit(statReadLength, "Kb", "Mb"));
 			System.out.println("erapsed time: " + Nunit(statErapsedTime, "msec") + " speed: " + kpx(fileKps,"KiB/s") + " " + mpx(fileKps, "MiB/s"));
 			System.out.println("backtrack raito: " + ratio((double)this.statBacktrackSize / statCharLength) + " backtrack: " + this.statBacktrackSize + " length: " + this.source.length() + ", consumed: " + statCharLength);
 			System.out.println("backtrack_count: " + this.statBacktrackCount + " average: " + ratio((double)this.statBacktrackSize / this.statBacktrackCount) + " worst: " + this.statWorstBacktrack);
-			System.out.println("created_object: " + this.statObjectCount + ", used_object: " + parsedObject.count() + " object_logs: " + maxLog);
-			System.out.println("exported_object: " + this.statExportCount + ", exported_size: " + this.statExportSize + " exported_failure: " + this.statExportFailure);
-			System.out.println("memo hit: " + this.memoHit + ", miss: " + this.memoMiss + 
-					", ratio: " + ratio(((double)this.memoHit / (this.memoHit+this.memoMiss))) + ", consumed memo:" + this.memoSize);
-			long total = Runtime.getRuntime().totalMemory() / 1024;
-			long free =  Runtime.getRuntime().freeMemory() / 1024;
+			int usedObject = parsedObject.count(); 
+			System.out.println("object: created: " + this.statObjectCount + " used: " + usedObject + " disposal ratio u/c " + ratio((double)usedObject/this.statObjectCount) + " stacks: " + maxLog);
+			System.out.println("stream: exported: " + this.statExportCount + ", size: " + this.statExportSize + " failure: " + this.statExportFailure);
+			System.out.println("calls: " + this.statCallCount + " repeated: " + this.statRepeatCount + " r/c: " + ratio((double)this.statRepeatCount/this.statCallCount));
+			System.out.println("memo hit: " + this.memoMap.memoHit + ", miss: " + this.memoMap.memoMiss + 
+					", ratio: " + ratio(((double)this.memoMap.memoHit / (this.memoMap.memoMiss))) + ", consumed memo:" + this.memoMap.memoSize +" slots: " + this.memoMap.statMemoSlotCount);
+			long total = Runtime.getRuntime().totalMemory();
+			long free =  Runtime.getRuntime().freeMemory();
 			long heap =  total - free;
 			long used =  heap - usedMemory;
-			System.out.println("heap: " + KMunit(heap, "KiB", "MiB") + " used: " + KMunit(used, "KiB", "MiB") + " heap/file: " + ratio((double) heap/ (statFileLength / 1024)));
-			this.showCallCounterList();
+			System.out.println("heap: " + KMunit(heap, "KiB", "MiB") + " used: " + KMunit(used, "KiB", "MiB") + " heap/file: " + ratio((double) heap/ (statFileLength)));
 			System.out.println();
 		}
 	}
-
-	protected long statCallCounter  = 0;
-	protected long statCallRepeated = 0;
 	
-	private void showCallCounterList() {
-		if(this.statCallCounterList != null) {
-			for(int i = 0; i < this.statCallCounterList.size(); i++) {
-				CallCounter c = this.statCallCounterList.ArrayValues[i];
-				statCallCounter += c.total;
-				statCallRepeated += c.repeated;
-				if(Main.VerboseStat) {
-					System.out.println("\t"+c.ruleName+" calls: " + c.total + " repeated: " + c.repeated + " r/c: " + ratio((double)c.repeated/c.total));
-				}
-			}
-		}
-		System.out.println("calls: " + statCallCounter + " repeated: " + statCallRepeated + " r/c: " + ratio((double)statCallRepeated/statCallCounter));
-	}
+//	private void showCallCounterList() {
+//		if(this.statCallCounterList != null) {
+//			for(int i = 0; i < this.statCallCounterList.size(); i++) {
+//				CallCounter c = this.statCallCounterList.ArrayValues[i];
+//				statCallCounter += c.total;
+//				statCallRepeated += c.repeated;
+//				if(Main.VerboseStat) {
+//					System.out.println("\t"+c.ruleName+" calls: " + c.total + " repeated: " + c.repeated + " r/c: " + ratio((double)c.repeated/c.total));
+//				}
+//			}
+//		}
+//	}
 
 
 	

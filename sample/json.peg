@@ -37,6 +37,10 @@ Member
   = << String@ NameSeparator Value@ #keyvalue >>
   ;
 String
+  = QuotationMark <{ ('\\"' / !QuotationMark .)* #string }> QuotationMark
+  ;
+
+StringT
   = &QuotationMark << QuotationMark Char* #string QuotationMark >>
   ;
 QuotationMark

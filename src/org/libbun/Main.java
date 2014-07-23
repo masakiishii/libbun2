@@ -16,7 +16,7 @@ import org.libbun.peg4d.FileSource;
 import org.libbun.peg4d.JsonPegGenerator;
 import org.libbun.peg4d.PackratParser;
 import org.libbun.peg4d.Peg;
-import org.libbun.peg4d.Peg4DParser;
+import org.libbun.peg4d.PEG4dParser;
 import org.libbun.peg4d.ParserContext;
 import org.libbun.peg4d.PegObject;
 import org.libbun.peg4d.Grammar;
@@ -44,6 +44,8 @@ public class Main {
 	// -i
 	private static boolean ShellMode = false;
 
+	// -c
+	private static boolean RecognitionOnlyMode = false;
 	//
 	private static String InputFileName = null;
 	
@@ -85,6 +87,7 @@ public class Main {
 
 	// --parser
 	public static int OptimizedLevel = 2;
+	public static int MemoFactor = -1;
 
 	
 	private static void parseCommandArguments(String[] args) {
@@ -135,6 +138,9 @@ public class Main {
 			else if (argument.equals("-i")) {
 				ShellMode = true;
 			}
+			else if (argument.equals("-c")) {
+				RecognitionOnlyMode = true;
+			}
 			else if (argument.equals("--bigdata")) {
 				BigDataOption = true;
 			}
@@ -166,6 +172,9 @@ public class Main {
 			}
 			else if(argument.startsWith("--parser:")) {
 				ParserType = argument;
+			}
+			else if(argument.startsWith("-Xw")) {
+				Main.MemoFactor  = (int)UCharset._ParseInt(argument.substring(3));
 			}
 			else {
 				ShowUsage("unknown option: " + argument);
@@ -236,16 +245,23 @@ public class Main {
 	}
 
 	public final static ParserContext newParserContext(ParserSource source) {
+		ParserContext p = null;
 		if(inParseAndValidateJson) {
-			return new ValidParserContext(source);
+			p = new ValidParserContext(source);
 		}
 		if(ParserType.equalsIgnoreCase("--parser:packrat")) {
-			return new PackratParser(source);
+			p = new PackratParser(source);
 		}
 		if(ParserType.equalsIgnoreCase("--parser:simple")) {
-			return new RecursiveDecentParser(source);
+			p = new RecursiveDecentParser(source);
 		}
-		return new Peg4DParser(source);  // best parser
+		if(p == null) {
+			p = new PEG4dParser(source);  // best parser
+		}
+		if(Main.RecognitionOnlyMode) {
+			p.setRecognitionOnly(true);
+		}
+		return p;
 	}
 	
 	public final static void main(String[] args) {
@@ -329,7 +345,7 @@ public class Main {
 			while(context.hasNode()) {
 				node = context.parseNode(startPoint);
 					if(context.hasChar()) {
-						System.out.println(ValidParserContext.InvalidLine);
+						//System.out.println(ValidParserContext.InvalidLine);
 						//System.out.println("** uncosumed: '" + context + "' **");
 						break;
 					}
@@ -451,7 +467,7 @@ public class Main {
 		if (Stream == null) {
 			try {
 				File f = new File(fileName);
-				if(f.length() < 128 * 1024) {
+				if(f.length() > 128 * 1024) {
 					return new FileSource(fileName);
 				}
 				Stream = new FileInputStream(fileName);
