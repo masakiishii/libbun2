@@ -299,8 +299,8 @@ template #continue(): void {
 	continue;
 }
 
-template #array(params) : void {
-	${list params}
+template #array(*) : any {
+	${NewArray}
 }
 
 template #throw(expr): void {
