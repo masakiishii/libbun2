@@ -258,7 +258,7 @@ public class Main {
 			p = new RecursiveDecentParser(source);
 		}
 		if(p == null) {
-			p = new PEG4dParser(source);  // best parser
+			p = new Peg4DParser(source);  // best parser
 		}
 		if(Main.RecognitionOnlyMode) {
 			p.setRecognitionOnly(true);
