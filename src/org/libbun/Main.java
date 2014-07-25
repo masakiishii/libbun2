@@ -17,7 +17,7 @@ import org.libbun.peg4d.FileSource;
 import org.libbun.peg4d.JsonPegGenerator;
 import org.libbun.peg4d.PackratParser;
 import org.libbun.peg4d.Peg;
-import org.libbun.peg4d.PEG4dParser;
+import org.libbun.peg4d.Peg4DParser;
 import org.libbun.peg4d.ParserContext;
 import org.libbun.peg4d.PegObject;
 import org.libbun.peg4d.Grammar;

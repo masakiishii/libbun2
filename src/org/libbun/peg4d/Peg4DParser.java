@@ -8,18 +8,18 @@ import org.libbun.Main;
 import org.libbun.UList;
 import org.libbun.peg4d.Memo.ObjectMemo;
 
-public class PEG4dParser extends RecursiveDecentParser {
+public class Peg4DParser extends RecursiveDecentParser {
 
-	public PEG4dParser(ParserSource source) {
+	public Peg4DParser(ParserSource source) {
 		super(source);
 	}
 	
-	private PEG4dParser(ParserSource source, long startIndex, long endIndex, UList<Peg> pegList) {
+	private Peg4DParser(ParserSource source, long startIndex, long endIndex, UList<Peg> pegList) {
 		super(source, startIndex, endIndex, pegList);
 	}
 
 	public ParserContext newParserContext(ParserSource source, long startIndex, long endIndex) {
-		return new PEG4dParser(source, startIndex, endIndex, this.pegList);
+		return new Peg4DParser(source, startIndex, endIndex, this.pegList);
 	}
 
 	public void initMemo() {
