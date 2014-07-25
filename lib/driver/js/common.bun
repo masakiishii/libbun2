@@ -248,8 +248,8 @@ template #arguments(*) {
 	(${list this ", "})
 }
 
-template #apply(f, args) {
-	${f}(${list args ", "})
+template #apply(name, args) {
+	${Apply}(${list args ", "})
 }
 
 template #return(): void {
