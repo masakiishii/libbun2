@@ -14,6 +14,7 @@ public class JsDriver extends SourceDriver {
 
 	public JsDriver() {
 		this.addCommand("NewArray", new NewArray());
+		this.addCommand("Apply", new Apply());
     }
 
 	@Override
@@ -35,6 +36,13 @@ public class JsDriver extends SourceDriver {
 	}
 	public void generateMain() {
 		
+	}
+	protected class Apply extends DriverCommand {
+		@Override
+		public void invoke(BunDriver driver, PegObject node, String[] param) {
+			String name = node.AST[0].getText();
+			driver.pushCode(name);
+		}
 	}
     protected class NewArray extends DriverCommand {
 		@Override
