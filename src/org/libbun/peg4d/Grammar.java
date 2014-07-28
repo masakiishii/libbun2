@@ -554,7 +554,7 @@ public final class Grammar {
 			opt(n("_")), choice(n("Rule"), n("Import")), opt(n("_")), s(";"), opt(n("_"))
 		));
 		this.check();
-		this.show("TopLevel");
+		//this.show("TopLevel");
 		return this;
 	}
 	

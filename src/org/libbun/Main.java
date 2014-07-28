@@ -284,8 +284,8 @@ public class Main {
 				gamma.setNode(node);
 				if(!ParseOnlyMode && driver != null) {
 					if(!(driver instanceof PegDumpper)) {
-						node = gamma.tryMatch(node, true);
-						//node = gamma.tryMatch(node, false);
+						//node = gamma.tryMatch(node, true);
+						node = gamma.tryMatch(node, false);
 					}
 					else {
 						node.matched = Functor.ErrorFunctor;
