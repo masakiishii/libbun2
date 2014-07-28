@@ -1,0 +1,39 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #union: union 
+            #identifier: data 
+            #structdeclaration: {
+               #typespecifier: int 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #identifier: id
+                  }
+               }
+            }
+            #structdeclaration: {
+               #typespecifier: char 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #pointer: *
+                     #identifier: content
+                  }
+               }
+            }
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #union: union 
+            #identifier: data 
+         }
+      }
+      #declarator: {
+         #identifier: d
+      }
+   }
+}

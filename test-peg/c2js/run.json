@@ -1,0 +1,5 @@
+{
+    "peg" : "#{SOURCE_ROOT}/sample/c2js.peg",
+    "input.ext" : "c",
+    "output.ext" : "out"
+}

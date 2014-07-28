@@ -1,0 +1,45 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #initdeclarator: {
+               #declarator: {
+                  #identifier: i 
+               }
+               #initializer: {
+                  #integer: 0
+               }
+            }
+         }
+         #whilestatement: {
+            #lt: {
+               #identifier: i 
+               #integer: 10
+            }
+            #compoundstatement: {
+               #expressionstatement: {
+                  #inc: {
+                     #identifier: i
+                  }
+               }
+            }
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

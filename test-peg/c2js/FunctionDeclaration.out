@@ -1,0 +1,19 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

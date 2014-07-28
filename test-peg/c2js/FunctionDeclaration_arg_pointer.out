@@ -1,0 +1,35 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #parameterlist: {
+            #parameterdeclaration: {
+               #declarationspecifier: {
+                  #typespecifier: int 
+               }
+               #declarator: {
+                  #identifier: argc
+               }
+            }
+            #parameterdeclaration: {
+               #declarationspecifier: {
+                  #typespecifier: char 
+               }
+               #declarator: {
+                  #pointer: **
+                  #identifier: argv
+               }
+            }
+         }
+      }
+      #compoundstatement: {
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

@@ -1,0 +1,41 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: func
+         #parameterdeclaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #declarator: {
+               #identifier: n
+            }
+         }
+      }
+      #compoundstatement: {
+         #ifstatement: {
+            #gt: {
+               #identifier: n 
+               #integer: 0
+            }
+            #compoundstatement: {
+               #returnstatement: {
+                  #minus: {
+                     #identifier: n 
+                     #integer: 1
+                  }
+               }
+            }
+         }
+         #returnstatement: {
+            #plus: {
+               #identifier: n 
+               #integer: 1
+            }
+         }
+      }
+   }
+}

@@ -1,0 +1,55 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: float 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c0 
+         }
+         #initializer: {
+            #float: 1.
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: float 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c1 
+         }
+         #initializer: {
+            #float: 2.0
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: float 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c2 
+         }
+         #initializer: {
+            #float: .3
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: float 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c2 
+         }
+         #initializer: {
+            #float: 4.f
+         }
+      }
+   }
+}

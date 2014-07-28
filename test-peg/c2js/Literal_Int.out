@@ -1,0 +1,55 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c0 
+         }
+         #initializer: {
+            #integer: 1
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c1 
+         }
+         #initializer: {
+            #integer: 2l
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c2 
+         }
+         #initializer: {
+            #integer: 3L
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: c3 
+         }
+         #initializer: {
+            #integer: 0x4
+         }
+      }
+   }
+}

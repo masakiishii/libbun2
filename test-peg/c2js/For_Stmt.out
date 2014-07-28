@@ -1,0 +1,44 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #declarator: {
+               #identifier: n
+            }
+         }
+         #forstatement: {
+            #assignmentexpression: {
+               #identifier: n 
+               #assignmentoperator: = 
+               #integer: 0
+            }
+            #lt: {
+               #identifier: n 
+               #integer: 10
+            }
+            #inc: {
+               #identifier: n
+            }
+            #compoundstatement: {
+	}
+	
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

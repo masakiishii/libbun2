@@ -1,0 +1,26 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #storageclassspecifier: static 
+         #inline: __inline 
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: func
+         #parameterdeclaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #declarator: {
+               #identifier: n
+            }
+         }
+      }
+      #compoundstatement: {
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

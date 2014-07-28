@@ -1,0 +1,50 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #struct: struct 
+            #identifier: student 
+         }
+      }
+      #declarator: {
+         #identifier: new_Student
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: {
+                  #struct: struct 
+                  #identifier: student 
+               }
+            }
+            #declarator: {
+               #identifier: s
+            }
+         }
+         #expressionstatement: {
+            #assignmentexpression: {
+               #field: {
+                  #identifier: s
+                  #identifier: number 
+               }
+               #assignmentoperator: = 
+               #integer: 10
+            }
+         }
+         #expressionstatement: {
+            #assignmentexpression: {
+               #field: {
+                  #identifier: s
+                  #identifier: name 
+               }
+               #assignmentoperator: = 
+               #string: "naruto"
+            }
+         }
+         #returnstatement: {
+            #identifier: s
+         }
+      }
+   }
+}

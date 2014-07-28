@@ -1,0 +1,166 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #struct: struct 
+            #identifier: student 
+            #structdeclaration: {
+               #typespecifier: int 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #identifier: number
+                  }
+               }
+            }
+            #structdeclaration: {
+               #typespecifier: char 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #pointer: *
+                     #identifier: name
+                  }
+               }
+            }
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #storageclassspecifier: typedef 
+         #typespecifier: {
+            #struct: struct 
+            #identifier: student 
+         }
+      }
+      #declarator: {
+         #identifier: Student
+      }
+   }
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typedefname: {
+            #identifier: Student 
+         }
+      }
+      #declarator: {
+         #pointer: *
+         #identifier: new_Student
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typedefname: {
+                  #identifier: Student 
+               }
+            }
+            #initdeclarator: {
+               #declarator: {
+                  #pointer: *
+                  #identifier: s 
+               }
+               #initializer: {
+                  #castexpression: {
+                     #typename: {
+                        #typedefname: {
+                           #identifier: Student 
+                        }
+                        #pointer: *
+                     }
+                     #apply: {
+                        #identifier: malloc
+                        #sizeof: {
+                           #identifier: Student
+                        }
+                     }
+                  }
+               }
+            }
+         }
+         #expressionstatement: {
+            #assignmentexpression: {
+               #ptr: {
+                  #identifier: s
+                  #identifier: number 
+               }
+               #assignmentoperator: = 
+               #integer: 10
+            }
+         }
+         #expressionstatement: {
+            #assignmentexpression: {
+               #ptr: {
+                  #identifier: s
+                  #identifier: name 
+               }
+               #assignmentoperator: = 
+               #string: "naruto"
+            }
+         }
+         #returnstatement: {
+            #identifier: s
+         }
+      }
+   }
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typedefname: {
+                  #identifier: Student 
+               }
+            }
+            #initdeclarator: {
+               #declarator: {
+                  #pointer: *
+                  #identifier: a 
+               }
+               #initializer: {
+                  #apply: {
+                     #identifier: new_Student
+                  }
+               }
+            }
+         }
+         #expressionstatement: {
+            #apply: {
+               #identifier: printf
+               #argumentexpressionlist: {
+                  #string: "%d\n"
+                  #ptr: {
+                     #identifier: a
+                     #identifier: number
+                  }
+               }
+            }
+         }
+         #expressionstatement: {
+            #apply: {
+               #identifier: printf
+               #argumentexpressionlist: {
+                  #string: "%s\n"
+                  #ptr: {
+                     #identifier: a
+                     #identifier: name
+                  }
+               }
+            }
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

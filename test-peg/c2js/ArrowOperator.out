@@ -1,0 +1,46 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: void 
+      }
+      #declarator: {
+         #pointer: *
+         #identifier: new_Student
+         #parameterdeclaration: {
+            #declarationspecifier: {
+               #typespecifier: {
+                  #struct: struct 
+                  #identifier: Student 
+               }
+            }
+            #declarator: {
+               #pointer: *
+               #identifier: s
+            }
+         }
+      }
+      #compoundstatement: {
+         #expressionstatement: {
+            #assignmentexpression: {
+               #ptr: {
+                  #identifier: s
+                  #identifier: number 
+               }
+               #assignmentoperator: = 
+               #integer: 10
+            }
+         }
+         #expressionstatement: {
+            #assignmentexpression: {
+               #ptr: {
+                  #identifier: s
+                  #identifier: name 
+               }
+               #assignmentoperator: = 
+               #string: "naruto"
+            }
+         }
+      }
+   }
+}

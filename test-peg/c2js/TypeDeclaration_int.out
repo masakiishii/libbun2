@@ -1,0 +1,32 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #initdeclarator: {
+               #declarator: {
+                  #identifier: a 
+               }
+               #initializer: {
+                  #integer: 1
+               }
+            }
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

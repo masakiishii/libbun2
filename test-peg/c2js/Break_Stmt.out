@@ -1,0 +1,53 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #declarator: {
+               #identifier: i
+            }
+         }
+         #forstatement: {
+            #assignmentexpression: {
+               #identifier: i 
+               #assignmentoperator: = 
+               #integer: 0
+            }
+            #lt: {
+               #identifier: i 
+               #integer: 10
+            }
+            #inc: {
+               #identifier: i
+            }
+            #compoundstatement: {
+               #ifstatement: {
+                  #gt: {
+                     #identifier: i 
+                     #integer: 5
+                  }
+                  #compoundstatement: {
+                     #break: break;
+		
+                  }
+               }
+            }
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

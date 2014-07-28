@@ -1,0 +1,69 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #storageclassspecifier: typedef 
+         #typespecifier: {
+            #struct: struct 
+            #identifier: A 
+            #structdeclaration: {
+               #typespecifier: int 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #identifier: X
+                  }
+               }
+            }
+         }
+      }
+      #initdeclaratorlist: {
+         #declarator: {
+            #pointer: *
+            #identifier: StructA
+         }
+         #declarator: {
+            #pointer: **
+            #identifier: StructAPtr
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typedefname: {
+            #identifier: StructA 
+         }
+      }
+      #declarator: {
+         #identifier: value
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #storageclassspecifier: typedef 
+         #typespecifier: int 
+      }
+      #declarator: {
+         #declarator: {
+            #identifier: fptr_t
+         }
+         #parameterlist: {
+            #declarationspecifier: {
+               #typespecifier: float
+            }
+            #declarationspecifier: {
+               #typespecifier: char
+            }
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typedefname: {
+            #identifier: fptr_t 
+         }
+      }
+      #declarator: {
+         #identifier: func_ptr
+      }
+   }
+}

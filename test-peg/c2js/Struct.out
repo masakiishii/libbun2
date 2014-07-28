@@ -1,0 +1,39 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #struct: struct 
+            #identifier: student 
+            #structdeclaration: {
+               #typespecifier: int 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #identifier: number
+                  }
+               }
+            }
+            #structdeclaration: {
+               #typespecifier: char 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #pointer: *
+                     #identifier: name
+                  }
+               }
+            }
+         }
+      }
+   }
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #struct: struct 
+            #identifier: student 
+         }
+      }
+      #declarator: {
+         #identifier: s
+      }
+   }
+}

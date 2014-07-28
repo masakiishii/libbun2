@@ -1,0 +1,17 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #struct: struct 
+            #identifier: KonohaFactory 
+         }
+      }
+      #initdeclarator: {
+         #declarator: {
+            #identifier: factory 
+         }
+         #initializer: {}
+      }
+   }
+}

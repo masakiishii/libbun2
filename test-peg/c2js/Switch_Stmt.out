@@ -1,0 +1,46 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #initdeclarator: {
+               #declarator: {
+                  #identifier: n 
+               }
+               #initializer: {
+                  #integer: 1
+               }
+            }
+         }
+         #switchstatement: {
+            #identifier: n
+            #compoundstatement: {
+               #case: {
+                  #integer: 1
+                  #break: break;
+	
+               }
+               #default: {
+                  #break: break;
+	
+               }
+            }
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}

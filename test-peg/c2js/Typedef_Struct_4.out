@@ -1,0 +1,35 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #storageclassspecifier: typedef 
+         #typespecifier: {
+            #struct: struct 
+            #structdeclaration: {
+               #typespecifier: int 
+               #structdeclaratorlist: {
+                  #declarator: {
+                     #identifier: a
+                  }
+               }
+            }
+            #structdeclaration: {
+               #typespecifier: {
+                  #union: union 
+                  #structdeclaration: {
+                     #typespecifier: int 
+                     #structdeclaratorlist: {
+                        #declarator: {
+                           #identifier: b
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+      #declarator: {
+         #identifier: StructA
+      }
+   }
+}

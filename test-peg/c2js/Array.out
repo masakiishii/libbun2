@@ -1,0 +1,38 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: void 
+      }
+      #declarator: {
+         #identifier: func
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #initdeclarator: {
+               #declarator: {
+                  #identifier: a
+                  #integer: 10
+               }
+               #initializer: {}
+            }
+         }
+         #expressionstatement: {
+            #assignmentexpression: {
+               #index: {
+                  #identifier: a
+                  #integer: 2
+               }
+               #assignmentoperator: = 
+               #integer: 3
+            }
+         }
+      }
+   }
+}

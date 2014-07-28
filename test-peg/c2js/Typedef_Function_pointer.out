@@ -1,0 +1,18 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #storageclassspecifier: typedef 
+         #typespecifier: void 
+      }
+      #declarator: {
+         #declarator: {
+            #pointer: *
+            #identifier: Func
+         }
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+   }
+}

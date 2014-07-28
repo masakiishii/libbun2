@@ -1,0 +1,15 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #typespecifier: {
+            #identifier: Type 
+            #enumeratorlist: {
+               #identifier: VOID
+               #identifier: INT
+               #identifier: CHAR
+            }
+         }
+      }
+   }
+}

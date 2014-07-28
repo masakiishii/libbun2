@@ -1,0 +1,18 @@
+
+#translationunit: {
+   #declaration: {
+      #declarationspecifier: {
+         #storageclassspecifier: typedef 
+         #typespecifier: {
+            #enumeratorlist: {
+               #identifier: VOID
+               #identifier: INT
+               #identifier: CHAR
+            }
+         }
+      }
+      #declarator: {
+         #identifier: Type
+      }
+   }
+}

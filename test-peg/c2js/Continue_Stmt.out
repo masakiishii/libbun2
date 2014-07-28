@@ -1,0 +1,71 @@
+
+#translationunit: {
+   #functiondefinition: {
+      #declarationspecifier: {
+         #typespecifier: int 
+      }
+      #declarator: {
+         #identifier: main
+         #declarationspecifier: {
+            #typespecifier: void
+         }
+      }
+      #compoundstatement: {
+         #declaration: {
+            #declarationspecifier: {
+               #typespecifier: int 
+            }
+            #initdeclaratorlist: {
+               #initdeclarator: {
+                  #declarator: {
+                     #identifier: i 
+                  }
+                  #initializer: {
+                     #integer: 0
+                  }
+               }
+               #initdeclarator: {
+                  #declarator: {
+                     #identifier: c 
+                  }
+                  #initializer: {
+                     #integer: 0
+                  }
+               }
+            }
+         }
+         #whilestatement: {
+            #lt: {
+               #identifier: i 
+               #integer: 10
+            }
+            #compoundstatement: {
+               #expressionstatement: {
+                  #inc: {
+                     #identifier: i
+                  }
+               }
+               #ifstatement: {
+                  #equequ: {
+                     #mod: {
+                        #identifier: i 
+                        #integer: 2
+                     }
+                     #integer: 0
+                  }
+                  #continue: continue;
+		
+               }
+               #expressionstatement: {
+                  #inc: {
+                     #identifier: c
+                  }
+               }
+            }
+         }
+         #returnstatement: {
+            #integer: 0
+         }
+      }
+   }
+}
